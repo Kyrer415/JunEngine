@@ -1,0 +1,91 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Projects\\Visual Studio projects\\JuniorEngine\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{D1277892-D3DC-4E22-85B8-A95C81DFDD6A}|JuniorEngine\\JuniorEngine.vcxproj|D:\\Projects\\Visual Studio projects\\JuniorEngine\\JuniorEngine\\Window.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{D1277892-D3DC-4E22-85B8-A95C81DFDD6A}|JuniorEngine\\JuniorEngine.vcxproj|solutionrelative:JuniorEngine\\Window.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D1277892-D3DC-4E22-85B8-A95C81DFDD6A}|JuniorEngine\\JuniorEngine.vcxproj|D:\\Projects\\Visual Studio projects\\JuniorEngine\\JuniorEngine\\Window.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{D1277892-D3DC-4E22-85B8-A95C81DFDD6A}|JuniorEngine\\JuniorEngine.vcxproj|solutionrelative:JuniorEngine\\Window.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D1277892-D3DC-4E22-85B8-A95C81DFDD6A}|JuniorEngine\\JuniorEngine.vcxproj|D:\\Projects\\Visual Studio projects\\JuniorEngine\\JuniorEngine\\Main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{D1277892-D3DC-4E22-85B8-A95C81DFDD6A}|JuniorEngine\\JuniorEngine.vcxproj|solutionrelative:JuniorEngine\\Main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Window.h",
+              "DocumentMoniker": "D:\\Projects\\Visual Studio projects\\JuniorEngine\\JuniorEngine\\Window.h",
+              "RelativeDocumentMoniker": "JuniorEngine\\Window.h",
+              "ToolTip": "D:\\Projects\\Visual Studio projects\\JuniorEngine\\JuniorEngine\\Window.h",
+              "RelativeToolTip": "JuniorEngine\\Window.h",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAwwB4AAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-09-05T03:29:44.946Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Window.cpp",
+              "DocumentMoniker": "D:\\Projects\\Visual Studio projects\\JuniorEngine\\JuniorEngine\\Window.cpp",
+              "RelativeDocumentMoniker": "JuniorEngine\\Window.cpp",
+              "ToolTip": "D:\\Projects\\Visual Studio projects\\JuniorEngine\\JuniorEngine\\Window.cpp",
+              "RelativeToolTip": "JuniorEngine\\Window.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-09-05T03:30:02.985Z"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Main.cpp",
+              "DocumentMoniker": "D:\\Projects\\Visual Studio projects\\JuniorEngine\\JuniorEngine\\Main.cpp",
+              "RelativeDocumentMoniker": "JuniorEngine\\Main.cpp",
+              "ToolTip": "D:\\Projects\\Visual Studio projects\\JuniorEngine\\JuniorEngine\\Main.cpp",
+              "RelativeToolTip": "JuniorEngine\\Main.cpp",
+              "ViewState": "AgIAABIAAAAAAAAAAAAAACcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-09-02T14:47:52.118Z"
+            }
+          ]
+        },
+        {
+          "DockedWidth": 2194,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{004be353-6879-467c-9d1e-9ac23cdf6d49}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
