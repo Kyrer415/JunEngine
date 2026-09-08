@@ -26,7 +26,7 @@ public:
 
 private:
 	// Внутренний метод инициилизации GLFW и создания окна
-	bool init();
+	bool Init();
 	// метод для корректного закрытия окна
 	void Shutdown();
 
