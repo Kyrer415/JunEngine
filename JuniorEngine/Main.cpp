@@ -1,6 +1,6 @@
 #include <iostream>
-#include <glad/glad.h>
 #include "Window.h" 
+#include "Renderer.h"
 
 
 
@@ -10,15 +10,15 @@ int main()
 
 	// Создаём окно через класс-обертку
 	Window window(800, 600, "JuniorEngine via OOP");
+	Renderer renderer; // создаём объект нашего рендерера
+
 
 	// Главный цикл движка
 	while (!window.ShouldClose())
 	{
-		// Очистка экрана (пока оставим эту функцию OpenGL здесь
-		// Но в будущем её перенесу в класс Renderer!
-		// Доступны функции gl, так как glad.c  подключен к проекту
-		glClearColor(0.1f, 0.1f, 0.14f, 1.0f); // цвет чуть темнее
-		glClear(GL_COLOR_BUFFER_BIT);
+		// Очистка экрана -->
+		// Теперь очисткой занимается рендерер! Чисто и красиво:
+		renderer.Clear(0.1f, 0.1f, 0.14f, 1.0f);
 
 		// обновляем окно (свапаем буферы, опрашваем собиытия)
 		window.Update();
