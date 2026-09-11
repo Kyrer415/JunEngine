@@ -1,11 +1,16 @@
 #include <iostream>
+#include <cmath>
 #include "Window.h"
 #include "Renderer.h"
 #include "Shader.h" // 1. Подключаем наш класс шейдеров
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 
 int main()
 {
+    setlocale(LC_ALL, "Russian");
+
     std::cout << "Engine Startup...\n";
 
     // Создаем подсистемы движка
@@ -44,6 +49,14 @@ int main()
 
         // 3. Вместо glUseProgram(shaderProgram) активируем наш класс!
         ourShader.Use();
+
+        // Динамически меняем цвет в зависисмотсти от времени работы приложения!
+        // glfwGetTime() Возвращает время в секундах с момента старта
+        float timeValue = (float)glfwGetTime();
+        float greenValue = (sin(timeValue) / 2.0f) + 0.5f; // Переводим синеусоиду в диапозон от 0.0 до 1.0
+
+        // Передаем плавно меняющийся цвет в шейдер через наш новый метод!
+        ourShader.SetFloat4("OurColor", 0.0f, greenValue, 0.0f, 1.0f);
 
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);

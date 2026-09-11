@@ -117,3 +117,15 @@ void Shader::Compile(const std::string& vertexCode, const std::string& fragmentC
 	 
 }
 
+void Shader::SetFloat4(const std::string& name, float v0, float v1, float v2, float v3) const
+{
+	// 1. Находим "адрес" переменной внутри скомпилированного шейдера
+	int vertexColorLocation = glGetUniformLocation(m_ID, name.c_str());
+
+	// 2. Если переменная найдена, загружаем в неё 4 наших значения
+	if (vertexColorLocation != -1)
+	{
+		glUniform4f(vertexColorLocation, v0, v1, v2, v3);
+	}
+}
+

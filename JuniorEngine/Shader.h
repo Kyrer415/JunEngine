@@ -14,6 +14,9 @@ public:
 	// Активация шейдерной программы (замена glUseProgram)
 	void Use() const;
 
+	// Метод для передачи 4-х чисел с плавающей точкой (например, цвет RGBA)
+	void SetFloat4(const std::string& name, float v0, float v1, float v2, float v3) const;
+
 	// В будущем здесь будут методы для передачи данных в шейдер (Юниформы)
 	// SetFloat
 	// SetMatrix4
