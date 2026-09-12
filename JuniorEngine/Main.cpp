@@ -1,10 +1,12 @@
-#include <iostream>
+﻿#include <iostream>
 #include <cmath>
-#include "Window.h"
-#include "Renderer.h"
-#include "Shader.h" // 1. Подключаем наш класс шейдеров
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+#include "Window.h"
+#include "Shader.h" 
+#include "Renderer.h"
+#include "VertexArray.h"
 
 
 int main()
@@ -27,20 +29,9 @@ int main()
          0.0f,  0.5f,  0.0f
     };
 
-    unsigned int VAO, VBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    // 3. Создаем объект нашего класса и загружаем данные одной строчкой! ^~^
+    VertexArray TriangleMesh;
+    TriangleMesh.SetData(vertices, sizeof(vertices));
 
     // Главный цикл движка
     while (!window.ShouldClose())
@@ -53,20 +44,15 @@ int main()
         // Динамически меняем цвет в зависисмотсти от времени работы приложения!
         // glfwGetTime() Возвращает время в секундах с момента старта
         float timeValue = (float)glfwGetTime();
-        float greenValue = (sin(timeValue) / 2.0f) + 0.5f; // Переводим синеусоиду в диапозон от 0.0 до 1.0
+        float greenValue = (sin(timeValue) / 2.0f) + 0.5f; // Переводим синеусоиду в диапозон от 0.0 до 1.0   
+        ourShader.SetFloat4("OurColor", 0.0f, greenValue, 0.0f, 1.0f);  // Передаем плавно меняющийся цвет в шейдер через наш новый метод!
 
-        // Передаем плавно меняющийся цвет в шейдер через наш новый метод!
-        ourShader.SetFloat4("OurColor", 0.0f, greenValue, 0.0f, 1.0f);
-
-        glBindVertexArray(VAO);
+        // 4. Отрисовка через ООП! Включаем буфер и отдаём команду видеокарте
+        TriangleMesh.Bind();
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         window.Update();
     }
-
-    // Очистка буферов при выходе (тоже потом спрячем)
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
 
     return 0;
 }
