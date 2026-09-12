@@ -1,2 +1,0 @@
-D:\Projects\Visual Studio projects\JuniorEngine\x64\Debug\glfw3.dll
-D:\Projects\Visual Studio projects\JuniorEngine\JuniorEngine\x64\Debug\JuniorEn.5C3DED97.Up2Date
