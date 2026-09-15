@@ -10,7 +10,7 @@ public:
 	~VertexArray();
 
 	// Загрузить вершины в видеопамятьи настроть атрибуты 
-	void SetData(const float* vertices, unsigned int size);
+	void SetData(const float* vertices, unsigned int vSize, const unsigned int* indicdes, unsigned int iSize);
 
 	// Активировать этот VertexArray для отрисовкеи
 	void Bind() const;
@@ -21,5 +21,5 @@ public:
 private:
 	unsigned int m_VAO; // ID контейнера настроек
 	unsigned int m_VBO; // ID буфера с сырыми данными вершин
-
+	unsigned int m_EBO; // Порядок соединения вершин
 };
