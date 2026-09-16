@@ -1,0 +1,24 @@
+# Системные папки Visual Studio
+.vs/
+x64/
+Debug/
+Release/
+
+# Файлы сборки и кэша компилятора
+*.obj
+*.log
+*.tlog
+*.lastbuildstate
+*.idb
+*.pdb
+*.ilk
+*.exe
+*.sdf
+*.opensdf
+*.suo
+*.user
+*.db
+*.VC.db
+
+# Папки сборки vcpkg (если они вдруг внутри проекта)
+vcpkg_installed/
