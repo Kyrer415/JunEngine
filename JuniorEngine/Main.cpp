@@ -39,6 +39,8 @@ int main()
     // 3. Создаем объект меша одной строчкой, сразу передавая туда вершины!
     Mesh Square(vertices, sizeof(vertices), indices, sizeof(indices));
 
+    float rotationAngle = 0.0f;
+
     // Главный цикл движка
     while (!window.ShouldClose())
     {
@@ -57,8 +59,14 @@ int main()
         // Включаем Шейдер
         ourShader.Use();
 
-        // Динамически меняем цвет в зависисмотсти от времени работы приложения!
-        // Теперь время даёт наш класс времени!
+        // 1. Увеличиваем угол поворота: скорость * Delta Time!
+        // 2.0f - это скорость вращения ( в радианах в секунду )
+        rotationAngle += 2.0f * Time::GetDeltaTime();
+
+        // 2. Передаём вычисленный угол в наш обновленный вершинный шейдер
+        ourShader.SetFloat("u_Angle", rotationAngle);
+
+        // Код польсации
         float timeValue = Time::GetTime();
         float greenValue = (sin(timeValue) / 2.0f) + 0.5f; // Переводим синусоиду в диапозон от 0.0 до 1.0   
         ourShader.SetFloat4("OurColor", 0.0f, greenValue, 0.0f, 1.0f);  // Передаем плавно меняющийся цвет в шейдер через наш метод!

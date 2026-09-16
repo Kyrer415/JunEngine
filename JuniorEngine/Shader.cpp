@@ -1,4 +1,4 @@
-#include "Shader.h"
+﻿#include "Shader.h"
 #include <glad/glad.h>
 #include <fstream>
 #include <sstream>
@@ -126,6 +126,16 @@ void Shader::SetFloat4(const std::string& name, float v0, float v1, float v2, fl
 	if (vertexColorLocation != -1)
 	{
 		glUniform4f(vertexColorLocation, v0, v1, v2, v3);
+	}
+}
+void Shader::SetFloat(const std::string& name, float value) const
+{
+	// 1. Находим "адрес" переменной внутри скомпилированного шейдера
+	int Location = glGetUniformLocation(m_ID, name.c_str());
+
+	if (Location != -1)
+	{
+		glUniform1f(Location, value);
 	}
 }
 
