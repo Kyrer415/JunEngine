@@ -42,6 +42,8 @@ int main()
     // Главный цикл движка
     while (!window.ShouldClose())
     {
+        // В самом начале кадра: обновляем Delta Time!
+        Time::Update();
 
         // Обработка ввода: если нажат ESCAPE (код 256), закрываем движок!
         if (Input::IsKeyPressed(window, 256))
