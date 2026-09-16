@@ -1,12 +1,12 @@
 ﻿#include <iostream>
 #include <cmath>
-#include <GLFW/glfw3.h>
 
 #include "Window.h"
 #include "Input.h"
 #include "Shader.h" 
 #include "Renderer.h"
 #include "Mesh.h"
+#include "Time.h"
 
 
 int main()
@@ -18,8 +18,6 @@ int main()
     // Создаем подсистемы движка
     Window window(800, 600, "JuniorEngine via OOP");
     Renderer renderer;
-
-    // Создаем шейдер 
     Shader ourShader("basic.vert", "basic.frag");
 
     // 1. задаём вершины
@@ -58,10 +56,10 @@ int main()
         ourShader.Use();
 
         // Динамически меняем цвет в зависисмотсти от времени работы приложения!
-        // glfwGetTime() Возвращает время в секундах с момента старта
-        float timeValue = (float)glfwGetTime();
-        float greenValue = (sin(timeValue) / 2.0f) + 0.5f; // Переводим синеусоиду в диапозон от 0.0 до 1.0   
-        ourShader.SetFloat4("OurColor", 0.0f, greenValue, 0.0f, 1.0f);  // Передаем плавно меняющийся цвет в шейдер через наш новый метод!
+        // Теперь время даёт наш класс времени!
+        float timeValue = Time::GetTime();
+        float greenValue = (sin(timeValue) / 2.0f) + 0.5f; // Переводим синусоиду в диапозон от 0.0 до 1.0   
+        ourShader.SetFloat4("OurColor", 0.0f, greenValue, 0.0f, 1.0f);  // Передаем плавно меняющийся цвет в шейдер через наш метод!
 
         // 4. Отрисовка одной командой!
         Square.Draw();
