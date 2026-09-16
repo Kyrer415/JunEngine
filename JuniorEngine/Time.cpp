@@ -3,6 +3,6 @@
 
 float Time::GetTime()
 {
-	// Забираем время у GLFW (он возвращает double, мы приводим его к float)
+	// Забираем время у GLFW (он возвращает double, мы приводим его к float))
 	return static_cast<float>(glfwGetTime());
 }
