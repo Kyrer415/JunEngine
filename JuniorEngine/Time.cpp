@@ -13,11 +13,11 @@ float Time::GetTime()
 void Time::Update()
 {
 	// 1. Получаем текущее время в секундах
-	float currentFramTime = GetTime();
+	float currentFrameTime = GetTime();
 
 	// 2. Вычисляем разницу между текущим и прошлым кадром
-	m_DeltaTime = currentFramTime - m_LastFrameTime;
+	m_DeltaTime = currentFrameTime - m_LastFrameTime;
 
 	// 3. Запоминаем текущее время как "Прошлое" для следующего кадра
-	m_LastFrameTime = currentFramTime;
+	m_LastFrameTime = currentFrameTime;
 }

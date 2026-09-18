@@ -30,9 +30,16 @@ void VertexArray::SetData(const float* vertices, unsigned int vSize, const unsig
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, iSize, indices, GL_STATIC_DRAW);
 	
-	// 3. Настраиваем указатели (Location = 0, 3 флоата на вершину, шаг 12 байт, без смещения)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	// 3. НАСТРОЙКА АТРИБУТА 0: Коорлдинаты (X, Y, Z)
+	// Шаг (Stride) теперь равен 5 * sizeof(float) (20 байт), так как в одной вершине 5 чисел
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+
+	// 4. НАСТРЙОКА АТРИБУТТА 1: координаты (U, V)
+	// Location = 1, состоит из 2 чисел (U, V), тип float.
+	// Смещение (Offset) равно 3* sizeof(float) (12 байт), пототому что UV начинаются ПОСЛЕ координат x,y,z!
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3* sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	// Отвязываем только VBO! 
 	// ВАЖНО:glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0) писать НЕЛЬЗЯ, иначе VAO забудет индексы!

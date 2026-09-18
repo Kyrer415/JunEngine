@@ -75,6 +75,9 @@
     <ClCompile Include="Time.cpp">
       <Filter>Исходные файлы\Engine\Core</Filter>
     </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Исходные файлы\Engine\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Window.h">
@@ -97,6 +100,12 @@
     </ClInclude>
     <ClInclude Include="Time.h">
       <Filter>Файлы заголовков\Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\stb_image.h">
+      <Filter>Исходные файлы\ThirdParty</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Файлы заголовков\Engine\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
