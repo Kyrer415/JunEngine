@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <string>
+#include <unordered_map> // 1. Подключаем хэш-таблицу
 
 class Shader
 {
@@ -32,8 +33,12 @@ private:
 	// Внутренний метод для компиляции и проверки на ошибки
 	void Compile(const std::string& vertexCode, const std::string& fragmentCode);
 
+	// 2. Внутренний метод для поиска локации с кэшированием
+	// mutable позволяет менять кэш даже внутри константных методов класса
+	int GetUniformLocation(const std::string& name) const;
+
 private:
 	unsigned int m_ID; // ID скомпилированной шейдерной программы
-
+	mutable std::unordered_map<std::string, int> m_UniformCache; // 3. "Имя -> Id ячейки"
 
 };

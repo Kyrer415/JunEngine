@@ -119,8 +119,8 @@ void Shader::Compile(const std::string& vertexCode, const std::string& fragmentC
 
 void Shader::SetFloat4(const std::string& name, float v0, float v1, float v2, float v3) const
 {
-	// 1. Находим "адрес" переменной внутри скомпилированного шейдера
-	int vertexColorLocation = glGetUniformLocation(m_ID, name.c_str());
+	// 1. Находим "адрес" переменной по нашему методу
+	int vertexColorLocation = GetUniformLocation(name);
 
 	// 2. Если переменная найдена, загружаем в неё 4 наших значения
 	if (vertexColorLocation != -1)
@@ -130,8 +130,8 @@ void Shader::SetFloat4(const std::string& name, float v0, float v1, float v2, fl
 }
 void Shader::SetFloat(const std::string& name, float value) const
 {
-	// 1. Находим "адрес" переменной внутри скомпилированного шейдера
-	int Location = glGetUniformLocation(m_ID, name.c_str());
+	// 1. Находим "адрес" с помощью нашего метода
+	int Location = GetUniformLocation(name);
 
 	if (Location != -1)
 	{
@@ -139,3 +139,24 @@ void Shader::SetFloat(const std::string& name, float value) const
 	}
 }
 
+int Shader::GetUniformLocation(const std::string& name) const
+{
+	// 1. Проверяем, есть ли уже это имя в кжше
+	auto it = m_UniformCache.find(name);
+	if (it != m_UniformCache.end())
+	{
+		return it->second; // Нашли! Мнгновенно возвращаем сохранённый ID ячейки
+	}
+
+
+// 2. Если в кеше нет, справшивает у видеокарты
+int Location = glGetUniformLocation(m_ID, name.c_str());
+
+if (Location == -1)
+{
+}
+
+// 3. Запоминаем в кэш
+m_UniformCache[name] = Location;
+return Location;
+}
