@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <glm/glm.hpp>
 #include <string>
 #include <unordered_map> // 1. Подключаем хэш-таблицу
 
@@ -14,6 +15,8 @@ public:
 
 	// Активация шейдерной программы (замена glUseProgram)
 	void Use() const;
+
+	void SetMatrix4(const std::string& name, const glm::mat4& matrix) const;
 
 	// Метод для передачи 4-х чисел с плавающей точкой (например, цвет RGBA)
 	void SetFloat4(const std::string& name, float v0, float v1, float v2, float v3) const;

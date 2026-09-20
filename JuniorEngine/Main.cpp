@@ -1,5 +1,9 @@
-﻿#include <iostream>
+﻿#include <glm/glm.hpp>
+#include <glad/glad.h>
+#include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
 #include <cmath>
+
 
 #include "Window.h"
 #include "Input.h"
@@ -20,24 +24,59 @@ int main()
     Renderer renderer;
     Shader ourShader("basic.vert", "basic.frag");
 
-    // Задаем 4 вершины квадрата: координаты (X,Y,Z) + координаты текстуры (U,V)
+    // Массив вершин куба: Координаты (X,Y,Z) + Текстурные координаты (U,V)
     float vertices[] = {
-         0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // Точка 0: правый верхний угол (соответствует правому верхнему углу картинки)
-         0.5f, -0.5f, 0.0f,   1.0f, 0.0f, // Точка 1: правый нижний угол (правый нижний угол картинки)
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // Точка 2: левый нижний угол (левый нижний угол картинки)
-        -0.5f,  0.5f, 0.0f,   0.0f, 1.0f  // Точка 3: левый верхний угол (левый верхний угол картинки)
+        // Задняя грань
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+
+        // Передняя грань
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+
+        // Левая грань
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+        // Правая грань
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+         // Нижняя грань
+         -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+          0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+          0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+         // Верхняя грань
+         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+          0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+          0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         -0.5f,  0.5f,  0.5f,  0.0f, 0.0f
     };
 
-    // 2. наш орядок соединения углов
+    // Индексы для сборки 6 граней (каждая грань состоит из 2-х треугольников)
     unsigned int indices[] = {
-        0, 1, 3, // первый триангл
-        1, 2, 3 // второй триангл
+         0,  1,  2,   2,  3,  0,
+         4,  5,  6,   6,  7,  4,
+         8,  9, 10,  10, 11,  8,
+        12, 13, 14,  14, 15, 12,
+        16, 17, 18,  18, 19, 16,
+        20, 21, 22,  22, 23, 20
     };
 
+    Mesh Cube(vertices, sizeof(vertices), indices, sizeof(indices));
 
-
-    // 3. Создаем объект меша одной строчкой, сразу передавая туда вершины!
-    Mesh Square(vertices, sizeof(vertices), indices, sizeof(indices));
+    // Включаем ТЕСТ глубины для настойщего 3d!
+    glEnable(GL_DEPTH_TEST);
 
     // Создадим объект наей текстуры!
     Texture wallTexture("openGL_logo.png");
@@ -62,23 +101,38 @@ int main()
         // Включаем Шейдер
         ourShader.Use();
 
-        // 1. Увеличиваем угол поворота: скорость * Delta Time!
-        // 2.0f - это скорость вращения ( в радианах в секунду )
-        rotationAngle += 2.0f * Time::GetDeltaTime();
+        // 1. Увеличиваем угол вращения на основе Delta Time
+        rotationAngle += 1.0f * Time::GetDeltaTime();
 
-        // 2. Передаём вычисленный угол в наш обновленный вершинный шейдер
-        ourShader.SetFloat("u_Angle", rotationAngle);
+        // 2. МАТРИЦА MODEL (Позиция, вращение и масштаб объекта в мире)
+        glm::mat4 model = glm::mat4(1.0f); // создаём единичную матрицу
+        // Вращаем куб по двум осям сразу (X и Y), чтобы видеть его объёмным!
+        model = glm::rotate(model, rotationAngle, glm::vec3(0.5f, 1.0f, 0.0f));
 
-        // Код польсации
-        float timeValue = Time::GetTime();
-        float greenValue = (sin(timeValue) / 2.0f) + 0.5f; // Переводим синусоиду в диапозон от 0.0 до 1.0   
-        ourShader.SetFloat4("ourColor", 0.0f, greenValue, 0.0f, 1.0f);  // Передаем плавно меняющийся цвет в шейдер через наш метод!
+        // 3. Матрица VIEW (Наша виртуальная камера)
+        glm::mat4 view = glm::mat4(1.0f);
+        // Отодвигаем "Камеру" назад на 3 единицы по оси Z, чтобы куб не был прямо в глазах
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -30.0f));
+
+        // 4. МАТРИЦА PROJECTION ( Перспектива)
+        // Параметры: угол обзора 45 градусов, соотношение сторон экрана 800\600, ближняя плоскость, дальняя плоскость
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+        // 5. Закидываем все три матрицы на видеокарту через наш новый метод!
+        ourShader.SetMatrix4("u_Model", model);
+        ourShader.SetMatrix4("u_View", view);
+        ourShader.SetMatrix4("u_Projection", projection);
+
+        // Старый код пульсации цвета (our Color) 
+        float TimeValue = Time::GetTime();
+        float greenValue = (sin(TimeValue) / 2.0f) + 0.5f;
+        ourShader.SetFloat4("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
 
         // АКТИВИРУЕМ ТЕКСТУРУ ПЕРЕД ОТРИСОВКОЙ!
         wallTexture.Bind(0);
 
         // 4. Отрисовка одной командой!
-        Square.Draw();
+        Cube.Draw();
 
         window.Update();
     }

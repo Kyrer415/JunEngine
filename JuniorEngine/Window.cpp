@@ -31,6 +31,8 @@ bool Window::Init()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+	glfwWindowHint(GLFW_DEPTH_BITS, 24);
+
 	// 2. Слздание окна
 	m_Window = glfwCreateWindow(m_Width, m_Height, m_Title.c_str(), nullptr, nullptr);
 	if (!m_Window)

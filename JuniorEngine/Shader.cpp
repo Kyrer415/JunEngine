@@ -1,5 +1,6 @@
 ﻿#include "Shader.h"
 #include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -159,4 +160,14 @@ if (Location == -1)
 // 3. Запоминаем в кэш
 m_UniformCache[name] = Location;
 return Location;
+}
+
+void Shader::SetMatrix4(const std::string& name, const glm::mat4& matrix) const
+{
+	int Location = GetUniformLocation(name); // наш оптимизированный кеш метод получения имени порта
+	if (Location != -1) // если он равен -1 значит порта несуществует 
+	{
+		// Передаём матрицу 4x4 на видеокарту
+		glUniformMatrix4fv(Location, 1, GL_FALSE, glm::value_ptr(matrix));
+	}
 }
