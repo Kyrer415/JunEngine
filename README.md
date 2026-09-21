@@ -1,1 +1,1 @@
-![Demo](media/cube_rotation.gif)
+![Demo](media/cube_rotation2.gif)
