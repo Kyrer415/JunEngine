@@ -1,2 +1,1 @@
-!\[Демо движка](media/cube\_rotation.gif)
-
+![Demo](media/cube_rotation.gif)
