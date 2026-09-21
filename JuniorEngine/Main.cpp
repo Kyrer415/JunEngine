@@ -80,6 +80,7 @@ int main()
 
     // Создадим объект наей текстуры!
     Texture wallTexture("openGL_logo.png");
+    Texture faceTexture("UnrealEngine_Logo.png");
 
     float rotationAngle = 0.0f;
 
@@ -101,6 +102,10 @@ int main()
         // Включаем Шейдер
         ourShader.Use();
 
+        ourShader.SetInt("texture1", 0); // Связываем texture1 со слотом 0
+        ourShader.SetInt("texture2", 1); // Связываем texture2 со слотом 1
+
+
         // 1. Увеличиваем угол вращения на основе Delta Time
         rotationAngle += 1.0f * Time::GetDeltaTime();
 
@@ -112,7 +117,7 @@ int main()
         // 3. Матрица VIEW (Наша виртуальная камера)
         glm::mat4 view = glm::mat4(1.0f);
         // Отодвигаем "Камеру" назад на 3 единицы по оси Z, чтобы куб не был прямо в глазах
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -30.0f));
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -25.0f));
 
         // 4. МАТРИЦА PROJECTION ( Перспектива)
         // Параметры: угол обзора 45 градусов, соотношение сторон экрана 800\600, ближняя плоскость, дальняя плоскость
@@ -130,6 +135,7 @@ int main()
 
         // АКТИВИРУЕМ ТЕКСТУРУ ПЕРЕД ОТРИСОВКОЙ!
         wallTexture.Bind(0);
+        faceTexture.Bind(1);
 
         // 4. Отрисовка одной командой!
         Cube.Draw();

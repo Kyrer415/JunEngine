@@ -171,3 +171,12 @@ void Shader::SetMatrix4(const std::string& name, const glm::mat4& matrix) const
 		glUniformMatrix4fv(Location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 }
+
+void Shader::SetInt(const std::string& name, int value) const
+{
+	int Location = GetUniformLocation(name);
+	if (Location != -1)
+	{
+		glUniform1i(Location, value);
+	}
+}
