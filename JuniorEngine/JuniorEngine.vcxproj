@@ -124,6 +124,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="C:\vcpkg\buildtrees\glad\x64-windows-rel\src\glad.c" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -135,6 +136,7 @@
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Mesh.h" />

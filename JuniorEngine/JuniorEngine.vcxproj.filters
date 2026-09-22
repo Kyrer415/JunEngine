@@ -78,6 +78,9 @@
     <ClCompile Include="Texture.cpp">
       <Filter>Исходные файлы\Engine\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Исходные файлы\Engine\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Window.h">
@@ -105,6 +108,9 @@
       <Filter>Исходные файлы\ThirdParty</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">
+      <Filter>Файлы заголовков\Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
       <Filter>Файлы заголовков\Engine\Renderer</Filter>
     </ClInclude>
   </ItemGroup>

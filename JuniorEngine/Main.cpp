@@ -4,7 +4,6 @@
 #include <iostream>
 #include <cmath>
 
-
 #include "Window.h"
 #include "Input.h"
 #include "Shader.h" 
@@ -12,6 +11,7 @@
 #include "Mesh.h"
 #include "Time.h"
 #include "Texture.h"
+#include "Camera.h" // подключили камеру
 
 int main()
 {
@@ -78,10 +78,19 @@ int main()
     // Включаем ТЕСТ глубины для настойщего 3d!
     glEnable(GL_DEPTH_TEST);
 
+
     // Создадим объект наей текстуры!
     Texture wallTexture("openGL_logo.png");
     Texture faceTexture("UnrealEngine_Logo.png");
 
+    // Включаем Шейдер
+    ourShader.Use();
+
+    ourShader.SetInt("texture1", 0); // Связываем texture1 со слотом 0
+    ourShader.SetInt("texture2", 1); // Связываем texture2 со слотом 1
+
+    // Создаём объект камеры
+    Camera camera(glm::vec3(0.0f, 0.0f, 25.0f));
     float rotationAngle = 0.0f;
 
     // Главный цикл движка
@@ -96,15 +105,12 @@ int main()
             break;
         }
 
+        // 3. Обновляем позицию камеры на основе клавиатуры и DeltaTime!
+        camera.ProcessInput(window, Time::GetDeltaTime());
 
         renderer.Clear(0.1f, 0.1f, 0.14f, 1.0f);
 
-        // Включаем Шейдер
         ourShader.Use();
-
-        ourShader.SetInt("texture1", 0); // Связываем texture1 со слотом 0
-        ourShader.SetInt("texture2", 1); // Связываем texture2 со слотом 1
-
 
         // 1. Увеличиваем угол вращения на основе Delta Time
         rotationAngle += 1.0f * Time::GetDeltaTime();
@@ -115,9 +121,7 @@ int main()
         model = glm::rotate(model, rotationAngle, glm::vec3(0.5f, 1.0f, 0.0f));
 
         // 3. Матрица VIEW (Наша виртуальная камера)
-        glm::mat4 view = glm::mat4(1.0f);
-        // Отодвигаем "Камеру" назад на 3 единицы по оси Z, чтобы куб не был прямо в глазах
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -30.0f));
+        glm::mat4 view = camera.GetViewMatrix();
 
         // 4. МАТРИЦА PROJECTION ( Перспектива)
         // Параметры: угол обзора 45 градусов, соотношение сторон экрана 800\600, ближняя плоскость, дальняя плоскость
