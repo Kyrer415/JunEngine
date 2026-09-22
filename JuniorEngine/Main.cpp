@@ -90,7 +90,7 @@ int main()
     ourShader.SetInt("texture2", 1); // Связываем texture2 со слотом 1
 
     // Создаём объект камеры
-    Camera camera(glm::vec3(0.0f, 0.0f, 25.0f));
+    Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
     float rotationAngle = 0.0f;
 
     // Главный цикл движка

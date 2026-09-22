@@ -12,7 +12,7 @@ void main()
 {
    // Магия 3D-конвейера: умножаем позицию вершины на матрицы MVP.
    // ВАЖНО: умножение в GLSL идет строго СПРАВА НАЛЕВО!
-    gl_Position = u_Projection * u_View * u_Model * vec4(aPos,0.1);
+    gl_Position = u_Projection * u_View * u_Model * vec4(aPos,1.0);
 
     // Передаём UV-координаты пикселя без изменений
     TexCoord = aTexCoord;
