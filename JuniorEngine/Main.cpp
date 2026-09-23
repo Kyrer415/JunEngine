@@ -102,7 +102,7 @@ int main()
         // Обработка ввода: если нажат ESCAPE (код 256), закрываем движок!
         if (Input::IsKeyPressed(window, 256))
         {
-            break;
+            window.Close();
         }
 
         // 3. Обновляем позицию камеры на основе клавиатуры и DeltaTime!

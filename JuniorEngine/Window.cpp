@@ -73,3 +73,7 @@ void Window::Shutdown()
 	}
 	glfwTerminate();
 }
+void Window::Close()
+{
+	glfwSetWindowShouldClose(m_Window, GLFW_TRUE);
+}
