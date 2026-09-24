@@ -77,3 +77,9 @@ void Window::Close()
 {
 	glfwSetWindowShouldClose(m_Window, GLFW_TRUE);
 }
+
+void Window::DisableCursor() const
+{
+	// Приказываем GLFW скрыть курсор и запереть его внутри окна
+	glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+}

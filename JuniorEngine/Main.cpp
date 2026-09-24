@@ -1,5 +1,5 @@
-﻿#include <glm/glm.hpp>
-#include <glad/glad.h>
+﻿#include <glad/glad.h>
+#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 #include <cmath>
@@ -93,6 +93,15 @@ int main()
     Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
     float rotationAngle = 0.0f;
 
+    // 2. Прячем курсор мыши и запираем в окне
+    window.DisableCursor();
+
+    // 3. Перемещаем длдя отслеживания перемещеия мыши
+    // Изначально ставим их в центр экрана (800x600 -> 400x300)
+    float lastX = 400.0f;
+    float lastY = 300.0f;
+    bool firstMouse = true; // Флаг, чтобы избежать дикого скачка камеры при первом кадре
+
     // Главный цикл движка
     while (!window.ShouldClose())
     {
@@ -107,6 +116,31 @@ int main()
 
         // 3. Обновляем позицию камеры на основе клавиатуры и DeltaTime!
         camera.ProcessInput(window, Time::GetDeltaTime());
+
+        // 5. Обработка мыши
+        double mouseX, mouseY;
+        // запрашиваем у GLFW координаты курсора
+        glfwGetCursorPos(window.GetNativeWindow(), &mouseX, &mouseY);
+
+        // Если это самый первый кадр, просто запомним позицию без рывка камеры
+        if (firstMouse)
+        {
+            lastX = (float)mouseX;
+            lastY = (float)mouseY;
+            firstMouse = false;
+        }
+
+        // ССчитаем смещение мыши между текущим и прошлым кадром
+        float xOffset = (float)mouseX - lastX;
+        // Инвертируем Y, так как в GLFW координаты экарна идут сверху вниз, а в 3D снизу вверх
+        float yOffset = lastY - (float)mouseY;
+
+        // Запоминаем текущие координаты как "Прошлые" для след. кадра
+        lastX = (float)mouseX;
+        lastY = (float)mouseY;
+
+        // Передаём дельту перемещения в класс камеры
+        camera.ProcessMouseMovement(xOffset, yOffset);
 
         renderer.Clear(0.1f, 0.1f, 0.14f, 1.0f);
 

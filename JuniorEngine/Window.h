@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <glad/glad.h> 
+#include <GLFW/glfw3.h>
 #include <string>
 
 // forward decalration на GLFW чтбы не засорять файыл проекта.
@@ -26,6 +28,7 @@ public:
 	// Получить сырой указатель на окно GLFW (нужно для подсистемы ввода)
 	struct GLFWwindow* GetNativeWindow() const { return m_Window; }
 
+	void DisableCursor() const;
 
 	// Получить Ширину и высоту 
 	int GetWidth() const { return m_Width; }
