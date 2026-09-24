@@ -142,7 +142,7 @@ void Shader::SetFloat(const std::string& name, float value) const
 
 int Shader::GetUniformLocation(const std::string& name) const
 {
-	// 1. Проверяем, есть ли уже это имя в кжше
+	// 1. Проверяем, есть ли уже это имя в кэше
 	auto it = m_UniformCache.find(name);
 	if (it != m_UniformCache.end())
 	{

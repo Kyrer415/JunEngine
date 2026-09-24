@@ -20,7 +20,7 @@ int main()
     std::cout << "Engine Startup...\n";
     
     // Создаем подсистемы движка
-    Window window(800, 600, "JuniorEngine via OOP");
+    Window window(1600, 1200, "JuniorEngine via OOP");
     Renderer renderer;
     Shader ourShader("basic.vert", "basic.frag");
 
@@ -98,8 +98,8 @@ int main()
 
     // 3. Перемещаем длдя отслеживания перемещеия мыши
     // Изначально ставим их в центр экрана (800x600 -> 400x300)
-    float lastX = 400.0f;
-    float lastY = 300.0f;
+    float lastX = window.GetWidth() / 2.0f;
+    float lastY = window.GetHeight() / 2.0f;
     bool firstMouse = true; // Флаг, чтобы избежать дикого скачка камеры при первом кадре
 
     // Главный цикл движка
