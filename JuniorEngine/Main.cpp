@@ -89,6 +89,19 @@ int main()
     ourShader.SetInt("texture1", 0); // Связываем texture1 со слотом 0
     ourShader.SetInt("texture2", 1); // Связываем texture2 со слотом 1
 
+    glm::vec3 CubePositions[] = {
+        glm::vec3(0.0f,  0.0f,  0.0f),
+        glm::vec3(2.0f,  5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3(2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f,  3.0f, -7.5f),
+        glm::vec3(1.3f, -2.0f, -2.5f),
+        glm::vec3(1.5f,  2.0f, -2.5f),
+        glm::vec3(1.5f,  0.2f, -1.5f),
+        glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
+
     // Создаём объект камеры
     Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
     float rotationAngle = 0.0f;
@@ -158,11 +171,10 @@ int main()
         glm::mat4 view = camera.GetViewMatrix();
 
         // 4. МАТРИЦА PROJECTION ( Перспектива)
-        // Параметры: угол обзора 45 градусов, соотношение сторон экрана 800\600, ближняя плоскость, дальняя плоскость
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+        // Параметры: угол обзора 45 градусов, соотношение сторон экрана , ближняя плоскость, дальняя плоскость
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)window.GetWidth() / (float)window.GetHeight(), 0.1f, 100.0f);
 
-        // 5. Закидываем все три матрицы на видеокарту через наш новый метод!
-        ourShader.SetMatrix4("u_Model", model);
+        // Тут матрицы уже две потому что model запускать через цикл!
         ourShader.SetMatrix4("u_View", view);
         ourShader.SetMatrix4("u_Projection", projection);
 
@@ -175,11 +187,24 @@ int main()
         wallTexture.Bind(0);
         faceTexture.Bind(1);
 
-        // 4. Отрисовка одной командой!
-        Cube.Draw();
+        for (unsigned int i = 0; i < 10; i++)
+        {
+            // Для каждого куба создаём свою собственную матрицу Model
+            glm::mat4 model = glm::mat4(1.0f);
 
+            // Сначала смещаем куб в его уникальую точку в мире
+            model = glm::translate(model, CubePositions[i]);
+
+            // Каждому кубу задаём свой уникальный угол и ось вращения на основе его индекса 'i'
+            float angle = 20.0f * i + 1.0f * Time::GetTime();
+            model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
+
+            ourShader.SetMatrix4("u_Model", model);
+
+            Cube.Draw();
+
+        }
         window.Update();
     }
-
     return 0;
 }
