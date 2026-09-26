@@ -13,7 +13,7 @@ public:
 	static void Update();
 
 private:
-	static float m_DeltaTime; // переменная для хранения дельты
+	static float m_DeltaTime; // Переменная для хранения дельты
 	static float m_LastFrameTime; // Время предыдущего кадра
 
 };
