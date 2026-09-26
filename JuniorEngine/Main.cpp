@@ -9,7 +9,7 @@
 #include "Shader.h" 
 #include "Renderer.h"
 #include "Mesh.h"
-#include "Time.h"
+#include "CoreTime.h"
 #include "Texture.h"
 #include "Camera.h" // подключили камеру
 

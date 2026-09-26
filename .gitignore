@@ -3,6 +3,11 @@
 x64/
 Debug/
 Release/
+/out/
+/build/
+.cmake/
+CMakePresets.json
+
 
 # Файлы сборки и кэша компилятора
 *.obj
