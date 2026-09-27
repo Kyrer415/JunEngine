@@ -1,4 +1,4 @@
-﻿#include "Window.h"
+﻿#include "Window\Window.h"
 #include <iostream>
 
 // GLAD строго перед GLFW!

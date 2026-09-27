@@ -1,4 +1,4 @@
-﻿#include "Mesh.h"
+﻿#include "Renderer\Mesh.h"
 #include <glad/glad.h>
 
 Mesh::Mesh()

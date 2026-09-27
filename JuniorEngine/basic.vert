@@ -1,6 +1,7 @@
 ﻿#version 330 core
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec2 aTexCoord; // Принимает UV-координаты из разметки VAO 
+layout (location = 2) in vec3 aNormal; // Принимает вектор нормали из VAO
 
 out vec2 TexCoord; // Отправляем эти координаты дальше во фрагментный шейдер
 

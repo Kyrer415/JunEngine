@@ -14,10 +14,32 @@ file(GLOB SOURCES
     "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/ThirdParty/*.h"
 )
 
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(JuniorEngine
+    JuniorEngine/Main.cpp  # <-- Добавили приставку папки к главному файлу!
+    JuniorEngine/Engine/Core/CoreTime.h
+    JuniorEngine/Engine/Core/CoreTime.cpp
+    JuniorEngine/Engine/Core/input.h
+    JuniorEngine/Engine/Core/input.cpp
+    JuniorEngine/Engine/Window/Window.h
+    JuniorEngine/Engine/Window/Window.cpp
+    JuniorEngine/Engine/Renderer/Renderer.h
+    JuniorEngine/Engine/Renderer/Renderer.cpp
+    JuniorEngine/Engine/Renderer/Shader.h
+    JuniorEngine/Engine/Renderer/Shader.cpp
+    JuniorEngine/Engine/Renderer/Mesh.h
+    JuniorEngine/Engine/Renderer/Mesh.cpp
+    JuniorEngine/Engine/Renderer/VertexArray.h
+    JuniorEngine/Engine/Renderer/VertexArray.cpp
+    JuniorEngine/Engine/Renderer/Texture.h
+    JuniorEngine/Engine/Renderer/Texture.cpp
+    JuniorEngine/Engine/Renderer/Camera.h
+    JuniorEngine/Engine/Renderer/Camera.cpp
+)
+
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
     "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine"
+    "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/Engine"
     "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/ThirdParty"
 )
 
@@ -34,12 +56,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     glad::glad # <-- Подключаем готовый скомпилированный Glad
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE 
-    opengl32
-    glfw
-    glm::glm
-    glad::glad
-)
 
 # Железно копируем шейдеры и текстуры прямо в папку, где собирается .exe файл
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

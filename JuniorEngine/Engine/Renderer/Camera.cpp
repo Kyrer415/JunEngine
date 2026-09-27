@@ -1,6 +1,6 @@
-﻿#include "Camera.h"
-#include "Window.h"
-#include "Input.h"
+﻿#include "Renderer\Camera.h"
+#include "Window\Window.h"
+#include "Core\Input.h"
 
 Camera::Camera(glm::vec3 position)
 	: m_Position(position),

@@ -1,5 +1,5 @@
-﻿#include "Input.h"
-#include "Window.h"
+﻿#include "Core/Input.h"
+#include "Window\Window.h"
 #include <GLFW/glfw3.h>
 
 bool Input::IsKeyPressed(const Window& window, int key)
