@@ -2,26 +2,42 @@
 out vec4 FragColor;
 
 in vec2 TexCoord; // Принимаем UV-координаты от вершинного щейдера
+in vec3 Normal; // Принимаем нормаль из вершинного шейдера
+in vec3 FragPos; // Принимаем мировую позицию точки
 
 // Специальный тип данных для текстуры (Ссэмплер)
 uniform sampler2D texture1;
 uniform sampler2D texture2;
+uniform vec4 ourColor; // пулс цвет из c++
 
-uniform vec4 ourColor;
+uniform vec3 u_LightPos; // Позици лампочки, которую мы передали через SetFloat3
 
 void main()
 {
-	// 1. Читаем цвет пикселя из первой текстуры
-	vec4 color1 = texture(texture1, TexCoord);
+	// Читаем цвет пикселя из смешаных текстур ue и opengl
+	vec4 TexColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.2) * ourColor;
 
-	// 2. Читаем цвет пикселя из второй текстуры
-	vec4 color2 = texture(texture2, TexCoord);
+	// 1. РАСЧЁТ AMBIENT (фоновое освещение)
+	// Просто даём 10% базовой яркости (0.1), чтобы тени не было провально чёрными
+	vec3 ambient = 0.1 * vec3(1.0, 1.0, 1.0);
 
-	// 3. Смешиваем с помощью mix()! 
-	// mix(A, B, X) линейно интерполирует между A и B.
-	// 0.2 означает, что итоговый цвет будет состоять на 80% из первой картинки и на 20% из второй.
-	vec4 blendedTexture = mix(color1, color2, 0.2);
+	// 2. РАСЧЁТ DIFFUSE (Диффузный свет)
+	// Нормализуем входную нормаль для точности
+	vec3 norm = normalize(Normal);
 
-	// 4. Умножаем на наш пульсирующий цвет
-	FragColor = blendedTexture* ourColor;
+	// Вычисляем вектор направления от точки куба к лампочке
+	vec3 lightDir = normalize(u_LightPos - FragPos);
+
+	// Скалярное произведение (dot product) находит косинус угла для падения света.
+	// max(..., 0.0) гарантирует, что если угол больше 90 градусов(свет светит сзади), значение не уйдёт в минус
+	float diff = max(dot(norm, lightDir), 0.0);
+
+	// Умножаем силу затухания на белый цвет лампы (1.0, 1.0, 1.0)
+	vec3 diffuse = diff * vec3(1.0, 1.0, 1.0);
+
+	// 3. ФИНАЛЬНАЯ СБОРКА: складываем фоновый и диффузный свет
+	vec3 resultLight = ambient + diffuse;
+
+	// 4. Умножаем цвет текстуры на полученное освещение!
+	FragColor = vec4(resultLight, 1.0) * TexColor;
 }

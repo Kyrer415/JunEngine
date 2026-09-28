@@ -20,6 +20,7 @@ public:
 
 	// Метод для передачи 4-х чисел с плавающей точкой (например, цвет RGBA)
 	void SetFloat4(const std::string& name, float v0, float v1, float v2, float v3) const;
+	void SetFloat3(const std::string& name, float v0, float v1, float v2) const;
 	void SetFloat(const std::string& name, float value) const;
 	void SetInt(const std::string& name, int value) const;
 

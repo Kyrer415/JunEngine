@@ -104,6 +104,8 @@ int main()
         glm::vec3(1.5f,  0.2f, -1.5f),
         glm::vec3(-1.3f,  1.0f, -1.5f)
     };
+    
+    glm::vec3 lightpos(1.2f, 1.0f, 2.0f);
 
     // Создаём объект камеры
     Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
@@ -161,6 +163,8 @@ int main()
         renderer.Clear(0.1f, 0.1f, 0.14f, 1.0f);
 
         ourShader.Use();
+
+        ourShader.SetFloat3("u_LightPos", lightpos.x, lightpos.y, lightpos.z);
 
         // 1. Увеличиваем угол вращения на основе Delta Time
         rotationAngle += 1.0f * Time::GetDeltaTime();

@@ -57,13 +57,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 
-# Железно копируем шейдеры и текстуры прямо в папку, где собирается .exe файл
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-    "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/basic.vert"
-    "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/basic.frag"
-    "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/openGL_Logo.png"
-    "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/UnrealEngine_Logo.png"
-    "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
-)
-
+add_custom_target(CopyAssets
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/basic.vert"
+        "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/basic.frag"
+        "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/openGL_Logo.png"
+        "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/UnrealEngine_Logo.png"
+        "${CMAKE_BINARY_DIR}")
+add_dependencies(${PROJECT_NAME} CopyAssets)

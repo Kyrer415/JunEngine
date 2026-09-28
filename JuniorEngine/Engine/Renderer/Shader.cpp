@@ -129,6 +129,19 @@ void Shader::SetFloat4(const std::string& name, float v0, float v1, float v2, fl
 		glUniform4f(vertexColorLocation, v0, v1, v2, v3);
 	}
 }
+
+void Shader::SetFloat3(const std::string& name, float v0, float v1, float v2) const
+{
+	// 1. Находим "адрес" переменной по нашему методу
+	int Location3 = GetUniformLocation(name);
+
+	// 2. Если переменная найдена, загружаем в неё 4 наших значения
+	if (Location3 != -1)
+	{
+		glUniform3f(Location3, v0, v1, v2);
+	}
+}
+
 void Shader::SetFloat(const std::string& name, float value) const
 {
 	// 1. Находим "адрес" с помощью нашего метода
