@@ -135,7 +135,7 @@ void Shader::SetFloat3(const std::string& name, float v0, float v1, float v2) co
 	// 1. Находим "адрес" переменной по нашему методу
 	int Location3 = GetUniformLocation(name);
 
-	// 2. Если переменная найдена, загружаем в неё 4 наших значения
+	// 2. Если переменная найдена, загружаем в неё 3 наших значения
 	if (Location3 != -1)
 	{
 		glUniform3f(Location3, v0, v1, v2);
@@ -168,6 +168,7 @@ int Location = glGetUniformLocation(m_ID, name.c_str());
 
 if (Location == -1)
 {
+	std::cerr << "Uniform not found: " << name << "\n";
 }
 
 // 3. Запоминаем в кэш

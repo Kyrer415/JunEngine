@@ -164,7 +164,13 @@ int main()
 
         ourShader.Use();
 
-        ourShader.SetFloat3("u_LightPos", lightpos.x, lightpos.y, lightpos.z);
+        // Считаем новые координаты лампы по круговой орбите
+        // 2.0f - это радиус круга, 1.0f * Time::GetTime() - скорость вращения
+        float lightX = sin(Time::GetTime() * 1.0f) * 2.0f;
+        float lightZ = cos(Time::GetTime() * 1.0f) * 2.0f;
+        float lightY = sin(Time::GetTime() * 1.0f) * 0.2f;
+
+        ourShader.SetFloat3("u_LightPos", lightX, lightY, lightZ);
 
         // 1. Увеличиваем угол вращения на основе Delta Time
         rotationAngle += 1.0f * Time::GetDeltaTime();
