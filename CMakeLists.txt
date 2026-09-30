@@ -61,6 +61,7 @@ add_custom_target(CopyAssets
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/basic.vert"
         "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/basic.frag"
+        "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/light.frag"
         "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/openGL_Logo.png"
         "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/UnrealEngine_Logo.png"
         "${CMAKE_BINARY_DIR}")

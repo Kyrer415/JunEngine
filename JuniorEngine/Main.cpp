@@ -23,6 +23,7 @@ int main()
     Window window(1600, 1200, "JuniorEngine via OOP");
     Renderer renderer;
     Shader ourShader("basic.vert", "basic.frag");
+    Shader lightShader("basic.vert", "light.frag"); // шейдер для поинтлайта
 
     // Массив вершин куба: Координаты (X,Y,Z) + Текстурные координаты (U,V)
         // Массив вершин куба: Позиция (X,Y,Z) + Текстура (U,V) + Нормали (nX,nY,nZ)
@@ -166,9 +167,9 @@ int main()
 
         // Считаем новые координаты лампы по круговой орбите
         // 2.0f - это радиус круга, 1.0f * Time::GetTime() - скорость вращения
-        float lightX = sin(Time::GetTime() * 1.0f) * 2.0f;
-        float lightZ = cos(Time::GetTime() * 1.0f) * 2.0f;
-        float lightY = sin(Time::GetTime() * 1.0f) * 0.2f;
+        float lightX = sin(Time::GetTime() * 1.0f) * 2.5f;
+        float lightZ = cos(Time::GetTime() * 1.0f) * 2.5f;
+        float lightY = sin(Time::GetTime() * 2.0f) * 0.5f + 1.0f;
 
         ourShader.SetFloat3("u_LightPos", lightX, lightY, lightZ);
 
@@ -217,6 +218,27 @@ int main()
             Cube.Draw();
 
         }
+
+        // Отрисвка кубика для лампы -->
+        lightShader.Use();
+
+        // Передаём в шейдер лампы те же самые общие матрицы View и Projection
+        lightShader.SetMatrix4("u_View", view);
+        lightShader.SetMatrix4("u_Projection", projection);
+
+        // Строим матрицу Model для лампы строго в её летающих координатах!
+        glm::mat4 lightModel = glm::mat4(1.0f);
+
+
+        lightModel = glm::translate(lightModel, glm::vec3(lightX, lightY, lightZ));
+
+        // Масштабируем кубик лампы, делая его маленьким ( в 5 раз меньше обычного)
+        lightModel = glm::scale(lightModel, glm::vec3(0.2f));
+
+        lightShader.SetMatrix4("u_Model", lightModel);
+
+        Cube.Draw();
+
         window.Update();
     }
     return 0;
