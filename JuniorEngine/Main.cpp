@@ -171,8 +171,12 @@ int main()
         float lightZ = cos(Time::GetTime() * 1.0f) * 2.5f;
         float lightY = sin(Time::GetTime() * 2.0f) * 0.5f + 1.0f;
 
+        ourShader.Use();
         ourShader.SetFloat3("u_LightPos", lightX, lightY, lightZ);
         ourShader.SetFloat3("u_LightColor", 1.0f, 1.0f, 1.0f); // наш белый цвет :3
+
+        glm::vec3 camPos = camera.GetPosition(); // Получаем позицию нашей камеру из класса camera
+        ourShader.SetFloat3("u_ViewPos", camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 
         // 1. Увеличиваем угол вращения на основе Delta Time
         rotationAngle += 1.0f * Time::GetDeltaTime();
@@ -196,7 +200,7 @@ int main()
         // Старый код пульсации цвета (our Color) 
         float TimeValue = Time::GetTime();
         float greenValue = (sin(TimeValue) / 2.0f) + 0.5f;
-        ourShader.SetFloat4("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
+        ourShader.SetFloat4("ourColor", 0.0f, 1.0, 0.0f, 1.0f);
 
         // АКТИВИРУЕМ ТЕКСТУРУ ПЕРЕД ОТРИСОВКОЙ!
         wallTexture.Bind(0);

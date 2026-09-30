@@ -14,6 +14,8 @@ public:
 	// Геттер матрицы вида (view Matrix) для шейдера
 	glm::mat4 GetViewMatrix() const;
 
+	glm::vec3 GetPosition() const { return m_Position; }
+
 	// Метод для перемещения камеры с клавиатуры
 	void ProcessInput(const Window& window, float deltaTime);
 
