@@ -6,16 +6,16 @@ Mesh::Mesh()
 {
 }
 
-Mesh::Mesh(const float* vertices, unsigned int vSize, const unsigned int* indices, unsigned int iSize)
+Mesh::Mesh(const Vertex* vertices, unsigned int vCount, const unsigned int* indices, unsigned int iSize)
 	: m_IndexCount(0)
 {
-	SetData(vertices, vSize, indices, iSize);
+	SetData(vertices, vCount, indices, iSize);
 }
 
-void Mesh::SetData(const float* vertices, unsigned int vSize, const unsigned int* indices, unsigned int iSize)
+void Mesh::SetData(const Vertex* vertices, unsigned int vCount, const unsigned int* indices, unsigned int iSize)
 {
 	// Загружаем данные в наш VertexArray
-	m_VAO.SetData(vertices, vSize, indices, iSize);
+	m_VAO.SetData(vertices, vCount, indices, iSize);
 
 	// Больше вершины не считаем, просто знаем кол-во индексов для отрисовки, iSize - это размер массива индексов в байтах, иднекс это тип uns int - 4 байта, просто делим общий размер в байтах на размер одного uns int
 	m_IndexCount = iSize / sizeof(unsigned int);

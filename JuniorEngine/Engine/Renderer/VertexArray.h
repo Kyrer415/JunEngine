@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+struct Vertex;
+
 class VertexArray
 {
 public:
@@ -10,7 +12,7 @@ public:
 	~VertexArray();
 
 	// Загрузить вершины в видеопамятьи настроть атрибуты 
-	void SetData(const float* vertices, unsigned int vSize, const unsigned int* indicdes, unsigned int iSize);
+	void SetData(const Vertex* vertices, unsigned int vCount, const unsigned int* indicdes, unsigned int iSize);
 
 	// Активировать этот VertexArray для отрисовкеи
 	void Bind() const;
