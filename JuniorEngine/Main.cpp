@@ -172,6 +172,7 @@ int main()
         float lightY = sin(Time::GetTime() * 2.0f) * 0.5f + 1.0f;
 
         ourShader.SetFloat3("u_LightPos", lightX, lightY, lightZ);
+        ourShader.SetFloat3("u_LightColor", 1.0f, 1.0f, 1.0f); // наш белый цвет :3
 
         // 1. Увеличиваем угол вращения на основе Delta Time
         rotationAngle += 1.0f * Time::GetDeltaTime();
@@ -225,6 +226,7 @@ int main()
         // Передаём в шейдер лампы те же самые общие матрицы View и Projection
         lightShader.SetMatrix4("u_View", view);
         lightShader.SetMatrix4("u_Projection", projection);
+
 
         // Строим матрицу Model для лампы строго в её летающих координатах!
         glm::mat4 lightModel = glm::mat4(1.0f);

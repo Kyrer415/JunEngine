@@ -17,6 +17,7 @@ public:
 	void Use() const;
 
 	void SetMatrix4(const std::string& name, const glm::mat4& matrix) const;
+	void SetMatrix3(const std::string& name, const glm::mat3& matrix) const;
 
 	// Метод для передачи 4-х чисел с плавающей точкой (например, цвет RGBA)
 	void SetFloat4(const std::string& name, float v0, float v1, float v2, float v3) const;

@@ -10,6 +10,7 @@ uniform sampler2D texture1;
 uniform sampler2D texture2;
 uniform vec4 ourColor; // пулс цвет из c++
 
+uniform vec3 u_LightColor; // цвет света от лампы :)
 uniform vec3 u_LightPos; // Позици лампочки, которую мы передали через SetFloat3
 
 void main()
@@ -18,7 +19,7 @@ void main()
 	vec4 TexColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.2) * ourColor;
 
 	// 1. РАСЧЁТ AMBIENT (фоновое освещение)
-	// Просто даём 10% базовой яркости (0.1), чтобы тени не было провально чёрными
+	// Просто даём 10% базовой яркости (0.1), чтобы тени не были провально чёрными
 	vec3 ambient = 0.1 * vec3(1.0, 1.0, 1.0);
 
 	// 2. РАСЧЁТ DIFFUSE (Диффузный свет)
@@ -32,8 +33,8 @@ void main()
 	// max(..., 0.0) гарантирует, что если угол больше 90 градусов(свет светит сзади), значение не уйдёт в минус
 	float diff = max(dot(norm, lightDir), 0.0);
 
-	// Умножаем силу затухания на белый цвет лампы (1.0, 1.0, 1.0)
-	vec3 diffuse = diff * vec3(1.0, 1.0, 1.0);
+	// Умножаем силу затухания на цвет лампы!
+	vec3 diffuse = diff * u_LightColor;
 
 	// 3. ФИНАЛЬНАЯ СБОРКА: складываем фоновый и диффузный свет
 	vec3 resultLight = ambient + diffuse;
