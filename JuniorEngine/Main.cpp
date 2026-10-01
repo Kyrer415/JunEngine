@@ -209,6 +209,21 @@ int main()
 
             ourShader.SetMatrix4("u_Model", model);
 
+            if (i % 2 == 0)
+            {
+                ourShader.SetFloat("material.ambient", 0.1f);
+                ourShader.SetFloat("material.diffuse", 1.0f);
+                ourShader.SetFloat("material.specular", 1.0f);
+                ourShader.SetFloat("material.shininess", 128.0f);
+            }
+            else
+            {
+                ourShader.SetFloat("material.ambient", 0.1f);
+                ourShader.SetFloat("material.diffuse", 0.8f);
+                ourShader.SetFloat("material.specular", 0.0f);
+                ourShader.SetFloat("material.shininess", 1.0f);
+            }
+
             Cube.Draw();
 
         }
