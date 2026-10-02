@@ -125,7 +125,6 @@ int main()
     float lastX = window.GetWidth() / 2.0f;
     float lastY = window.GetHeight() / 2.0f;
     bool firstMouse = true; // Флаг, чтобы избежать дикого скачка камеры при первом кадре
-    float lastToggleTime = 0.0f; // Время последенего переключения режима мыши
     bool isUIFocused = false; // По умолчанию мы в режиме полёта(курсор зафиксирован и спрятан)
     bool altKeyReleased = true; // Предохранитель от зажимания
 
@@ -136,6 +135,7 @@ int main()
     float lightheight = 2.0f;
     float lightColorIntensity[3] = { 1.0f, 1.0f, 1.0f }; // Цвет лампы (RGB массив для ImGui)
 
+    float CubeScale = 0;
 
     // Главный цикл движка
     while (!window.ShouldClose())
@@ -185,7 +185,7 @@ int main()
         // Обрабатываем движение камеры только если мышь не занята интерфейсом!
         if (!isUIFocused)
         {
-            double MouseX, mouseY;
+            double mouseX, mouseY;
             glfwGetCursorPos(window.GetNativeWindow(), &mouseX, &mouseY);
 
             if (firstMouse)
@@ -219,6 +219,11 @@ int main()
         // 1. Управление материалом кубов
         ImGui::Text("Material Settings:");
         ImGui::SliderFloat("Shininess", &testShininess, 1.0f, 256.0f);
+
+        ImGui::Text("Transform Settings:");
+        ImGui::Separator();
+
+        ImGui::SliderFloat("Scale Cube", &CubeScale, 20.0f, -5.0f);
         
         ImGui::Separator();
 
@@ -249,16 +254,7 @@ int main()
         ourShader.SetFloat3("u_LightPos", lightX, lightY, lightZ);
         ourShader.SetFloat3("u_LightColor", lightColorIntensity[0], lightColorIntensity[1], lightColorIntensity[2]); // наш белый цвет :3
 
-        glm::vec3 camPos = camera.GetPosition(); // Получаем позицию нашей камеру из класса camera
         ourShader.SetFloat3("u_ViewPos", camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
-
-        // 1. Увеличиваем угол вращения на основе Delta Time
-        rotationAngle += 1.0f * Time::GetDeltaTime();
-
-        // 2. МАТРИЦА MODEL (Позиция, вращение и масштаб объекта в мире)
-        glm::mat4 model = glm::mat4(1.0f); // создаём единичную матрицу
-        // Вращаем куб по двум осям сразу (X и Y), чтобы видеть его объёмным!
-        model = glm::rotate(model, rotationAngle, glm::vec3(0.5f, 1.0f, 0.0f));
 
         // 3. Матрица VIEW (Наша виртуальная камера)
         glm::mat4 view = camera.GetViewMatrix();
@@ -273,7 +269,6 @@ int main()
 
         // Старый код пульсации цвета (our Color) 
         float TimeValue = Time::GetTime();
-        float greenValue = (sin(TimeValue) / 2.0f) + 0.5f;
         ourShader.SetFloat4("ourColor", 0.0f, 1.0, 0.0f, 1.0f);
 
         // АКТИВИРУЕМ ТЕКСТУРУ ПЕРЕД ОТРИСОВКОЙ!
@@ -291,6 +286,8 @@ int main()
             // Каждому кубу задаём свой уникальный угол и ось вращения на основе его индекса 'i'
             float angle = 20.0f * i + 1.0f * Time::GetTime();
             model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
+
+            model = glm::scale(model, glm::vec3(2.0f, CubeScale, 1.0f));
 
             ourShader.SetMatrix4("u_Model", model);
 
