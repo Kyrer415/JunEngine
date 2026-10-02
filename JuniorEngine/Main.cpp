@@ -125,12 +125,17 @@ int main()
     float lastX = window.GetWidth() / 2.0f;
     float lastY = window.GetHeight() / 2.0f;
     bool firstMouse = true; // Флаг, чтобы избежать дикого скачка камеры при первом кадре
-
-    float testShininess = 32.0f; // Дефолтная глянцевость
-
     float lastToggleTime = 0.0f; // Время последенего переключения режима мыши
     bool isUIFocused = false; // По умолчанию мы в режиме полёта(курсор зафиксирован и спрятан)
     bool altKeyReleased = true; // Предохранитель от зажимания
+
+    // Наш отдел настроек для ImGui
+    float testShininess = 32.0f; // Дефолтная глянцевость
+    float lightRadius = 2.5f; // Радиус орбиты лампочки
+    float lightOrbitSpeed = 1.0f; // Скорость вращения
+    float lightheight = 2.0f;
+    float lightColorIntensity[3] = { 1.0f, 1.0f, 1.0f }; // Цвет лампы (RGB массив для ImGui)
+
 
     // Главный цикл движка
     while (!window.ShouldClose())
@@ -209,8 +214,24 @@ int main()
         // Создаём наше всплывающее дебаг-окно!
         ImGui::Begin("Engine Control Panel");
         ImGui::Text("JuniorEngine Debag Menu");
-        // Привязываем ползунок к нашей переменной testshininess (диапазон от 1 до 256)
+        ImGui::Separator();
+
+        // 1. Управление материалом кубов
+        ImGui::Text("Material Settings:");
         ImGui::SliderFloat("Shininess", &testShininess, 1.0f, 256.0f);
+        
+        ImGui::Separator();
+
+        // Управление летающей лампачкеой
+        ImGui::Text("Light Source Settings:");
+        ImGui::SliderFloat("Orbit Radius", &lightRadius, 0.5f, 10.0); // крутим радиус от 0.5 до 10 
+        ImGui::SliderFloat("Orbit Height", &lightheight, -5.0f, 5.0f); // крутим высоту от -5 до 5
+        ImGui::SliderFloat("Orbit Speed", &lightOrbitSpeed, 0.0f, 5.0f); // Скорость от 0(стоп) до 5
+  
+
+        // Тот самый ColorPicker! Принимает имя и указатель на массив из 3 флоатов (RGB)
+        ImGui::ColorEdit3("Light Color", lightColorIntensity);
+
         ImGui::End();
 
 
@@ -219,14 +240,14 @@ int main()
         ourShader.Use();
 
         // Считаем новые координаты лампы по круговой орбите
-        // 2.0f - это радиус круга, 1.0f * Time::GetTime() - скорость вращения
-        float lightX = sin(Time::GetTime() * 1.0f) * 2.5f;
-        float lightZ = cos(Time::GetTime() * 1.0f) * 2.5f;
-        float lightY = sin(Time::GetTime() * 2.0f) * 0.5f + 1.0f;
+        // lightColorIntensity и прочие наши параметры передаём от ImGui! :3
+        float lightX = sin(Time::GetTime() * lightOrbitSpeed) * lightRadius;
+        float lightZ = cos(Time::GetTime() * lightOrbitSpeed) * lightRadius;
+        float lightY = sin(Time::GetTime() * 2.0f) * 0.5f + lightheight;
 
         ourShader.Use();
         ourShader.SetFloat3("u_LightPos", lightX, lightY, lightZ);
-        ourShader.SetFloat3("u_LightColor", 1.0f, 1.0f, 1.0f); // наш белый цвет :3
+        ourShader.SetFloat3("u_LightColor", lightColorIntensity[0], lightColorIntensity[1], lightColorIntensity[2]); // наш белый цвет :3
 
         glm::vec3 camPos = camera.GetPosition(); // Получаем позицию нашей камеру из класса camera
         ourShader.SetFloat3("u_ViewPos", camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
