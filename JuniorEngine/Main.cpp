@@ -1,7 +1,10 @@
 ﻿#include <glad/glad.h>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <iostream>
+#include <iostream> 
 #include <cmath>
 
 #include "Window\Window.h"
@@ -21,6 +24,19 @@ int main()
     
     // Создаем подсистемы движка
     Window window(1600, 1200, "JuniorEngine via OOP");
+
+    // 1. Создаём контекст Dear ImGui
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+    // Включаем тёмную стильную тему интерфейса 
+    ImGui::StyleColorsDark();
+
+    // 2. Инициилизируем мосты (платформы и реендер)
+    ImGui_ImplGlfw_InitForOpenGL(window.GetNativeWindow(), true);
+    ImGui_ImplOpenGL3_Init("#version 330 core");
+
     Renderer renderer;
     Shader ourShader("basic.vert", "basic.frag");
     Shader lightShader("basic.vert", "light.frag"); // шейдер для поинтлайта
@@ -109,6 +125,11 @@ int main()
     float lastX = window.GetWidth() / 2.0f;
     float lastY = window.GetHeight() / 2.0f;
     bool firstMouse = true; // Флаг, чтобы избежать дикого скачка камеры при первом кадре
+    bool isUIFocused = false; // По умолчанию мы в режиме полёта(курсор зафиксирован и спрятан)
+
+    float testShininess = 32.0f; // Дефолтная глянцевость
+
+    float lastToggleTime = 0.0f; // Время последенего переключения режима мыши
 
     // Главный цикл движка
     while (!window.ShouldClose())
@@ -130,25 +151,57 @@ int main()
         // запрашиваем у GLFW координаты курсора
         glfwGetCursorPos(window.GetNativeWindow(), &mouseX, &mouseY);
 
-        // Если это самый первый кадр, просто запомним позицию без рывка камеры
-        if (firstMouse)
+        // Переключаем режим на кнопку LEFT ALT ( код 342 в GLFW / Input), проверяя что с пролшлого нажатия прошло больше 0.2 сек
+        if (Input::IsKeyPressed(window, 342) && (Time::GetTime() - lastToggleTime) > 0.2f)
         {
-            lastX = (float)mouseX;
-            lastY = (float)mouseY;
-            firstMouse = false;
+            isUIFocused = !isUIFocused;
+            lastToggleTime = Time::GetDeltaTime();
+
+            if (isUIFocused)
+                window.EnableCursor(); // освобождаем мышь для ImGui
+            else
+                window.DisableCursor();
+
+            // небольшая задержка, чтобы кнопка не спамила переключением за один кадр
+            firstMouse = true; // Сбрасываем скачок камеры при возврате
         }
 
-        // ССчитаем смещение мыши между текущим и прошлым кадром
-        float xOffset = (float)mouseX - lastX;
-        // Инвертируем Y, так как в GLFW координаты экарна идут сверху вниз, а в 3D снизу вверх
-        float yOffset = lastY - (float)mouseY;
+        // Обрабатываем движение камеры только если мышь не занята интерфейсом!
+        if (!isUIFocused)
+        {
+            double MouseX, mouseY;
+            glfwGetCursorPos(window.GetNativeWindow(), &mouseX, &mouseY);
 
-        // Запоминаем текущие координаты как "Прошлые" для след. кадра
-        lastX = (float)mouseX;
-        lastY = (float)mouseY;
+            if (firstMouse)
+            {
+                lastX = (float)mouseX;
+                lastY = (float)mouseY;
+                firstMouse = false;
+            }
+            // ССчитаем смещение мыши между текущим и прошлым кадром
+            float xOffset = (float)mouseX - lastX;
+            // Инвертируем Y, так как в GLFW координаты экарна идут сверху вниз, а в 3D снизу вверх
+            float yOffset = lastY - (float)mouseY;
+            // Запоминаем текущие координаты как "Прошлые" для след. кадра
+            lastX = (float)mouseX;
+            lastY = (float)mouseY;
 
-        // Передаём дельту перемещения в класс камеры
-        camera.ProcessMouseMovement(xOffset, yOffset);
+            // Передаём дельту перемещения в класс камеры
+            camera.ProcessMouseMovement(xOffset, yOffset);
+        }
+
+        // Старт кадра ImGui 
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        // Создаём наше всплывающее дебаг-окно!
+        ImGui::Begin("Engine Control Panel");
+        ImGui::Text("JuniorEngine Debag Menu");
+        // Привязываем ползунок к нашей переменной testshininess (диапазон от 1 до 256)
+        ImGui::SliderFloat("Shininess", &testShininess, 1.0f, 256.0f);
+        ImGui::End();
+
 
         renderer.Clear(0.1f, 0.1f, 0.14f, 1.0f);
 
@@ -214,7 +267,7 @@ int main()
                 ourShader.SetFloat("material.ambient", 0.1f);
                 ourShader.SetFloat("material.diffuse", 1.0f);
                 ourShader.SetFloat("material.specular", 1.0f);
-                ourShader.SetFloat("material.shininess", 128.0f);
+                ourShader.SetFloat("material.shininess", testShininess); // слайдер управляет этим!
             }
             else
             {
@@ -249,7 +302,17 @@ int main()
 
         Cube.Draw();
 
+        // Финальный рендер кадра ImGui на экран
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         window.Update();
     }
+
+    // выгружаем ресурсы интерфейса из памяти
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
     return 0;
 }

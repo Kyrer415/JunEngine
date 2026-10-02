@@ -47,12 +47,14 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 find_package(glad REQUIRED) # <-- Ищем Glad в vcpkg
+find_package(imgui REQUIRED) # <-- тут ищем imgui!
 
 # Линкуем готовые бинарники vcpkg
 target_link_libraries(${PROJECT_NAME} PRIVATE 
     opengl32
     glfw
     glm::glm
+    imgui::imgui
     glad::glad # <-- Подключаем готовый скомпилированный Glad
 )
 

@@ -83,3 +83,9 @@ void Window::DisableCursor() const
 	// Приказываем GLFW скрыть курсор и запереть его внутри окна
 	glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
+
+void Window::EnableCursor() const
+{
+	// Приказываем GLFW показать курсор 
+	glfwSetInputMode(m_Window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}

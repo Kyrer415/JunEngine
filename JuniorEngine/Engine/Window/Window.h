@@ -29,6 +29,7 @@ public:
 	struct GLFWwindow* GetNativeWindow() const { return m_Window; }
 
 	void DisableCursor() const;
+	void EnableCursor() const;
 
 	// Получить Ширину и высоту 
 	int GetWidth() const { return m_Width; }
