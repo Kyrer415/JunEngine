@@ -39,6 +39,9 @@ Texture::Texture(const std::string& filePath)
 
 	// отвзяываем текстуру
 	glBindTexture(GL_TEXTURE_2D, 0);
+	
+	// Чистим дубликат в оперативной памяти так как в VRAM уже текстуры закинуты!
+	stbi_image_free(LocalBuffer);
 }
 
 Texture::~Texture()
