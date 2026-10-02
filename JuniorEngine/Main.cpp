@@ -125,11 +125,12 @@ int main()
     float lastX = window.GetWidth() / 2.0f;
     float lastY = window.GetHeight() / 2.0f;
     bool firstMouse = true; // Флаг, чтобы избежать дикого скачка камеры при первом кадре
-    bool isUIFocused = false; // По умолчанию мы в режиме полёта(курсор зафиксирован и спрятан)
 
     float testShininess = 32.0f; // Дефолтная глянцевость
 
     float lastToggleTime = 0.0f; // Время последенего переключения режима мыши
+    bool isUIFocused = false; // По умолчанию мы в режиме полёта(курсор зафиксирован и спрятан)
+    bool altKeyReleased = true; // Предохранитель от зажимания
 
     // Главный цикл движка
     while (!window.ShouldClose())
@@ -152,18 +153,28 @@ int main()
         glfwGetCursorPos(window.GetNativeWindow(), &mouseX, &mouseY);
 
         // Переключаем режим на кнопку LEFT ALT ( код 342 в GLFW / Input), проверяя что с пролшлого нажатия прошло больше 0.2 сек
-        if (Input::IsKeyPressed(window, 342) && (Time::GetTime() - lastToggleTime) > 0.2f)
+        if (Input::IsKeyPressed(window, 342))
         {
-            isUIFocused = !isUIFocused;
-            lastToggleTime = Time::GetDeltaTime();
+            if (altKeyReleased)
+            {
+                isUIFocused = !isUIFocused;
 
-            if (isUIFocused)
-                window.EnableCursor(); // освобождаем мышь для ImGui
-            else
-                window.DisableCursor();
 
-            // небольшая задержка, чтобы кнопка не спамила переключением за один кадр
-            firstMouse = true; // Сбрасываем скачок камеры при возврате
+                if (isUIFocused)
+                    window.EnableCursor(); // освобождаем мышь для ImGui
+                else
+                    window.DisableCursor();
+
+                // небольшая задержка, чтобы кнопка не спамила переключением за один кадр
+                firstMouse = true; // Сбрасываем скачок камеры при возврате
+
+                altKeyReleased = false; // блокируем повторные нажаития
+            }
+
+        }
+        else
+        {
+            altKeyReleased = true;
         }
 
         // Обрабатываем движение камеры только если мышь не занята интерфейсом!
