@@ -135,7 +135,9 @@ int main()
     float lightheight = 2.0f;
     float lightColorIntensity[3] = { 1.0f, 1.0f, 1.0f }; // Цвет лампы (RGB массив для ImGui)
 
-    float CubeScale = 0;
+    float CubeScale = 1;
+
+    bool isDiscoMode = false; // Наш диско-режим
 
     // Главный цикл движка
     while (!window.ShouldClose())
@@ -236,6 +238,9 @@ int main()
 
         // Тот самый ColorPicker! Принимает имя и указатель на массив из 3 флоатов (RGB)
         ImGui::ColorEdit3("Light Color", lightColorIntensity);
+        
+        ImGui::Checkbox("Enable Disco Mode", &isDiscoMode);
+
 
         ImGui::End();
 
@@ -252,7 +257,23 @@ int main()
 
         ourShader.Use();
         ourShader.SetFloat3("u_LightPos", lightX, lightY, lightZ);
-        ourShader.SetFloat3("u_LightColor", lightColorIntensity[0], lightColorIntensity[1], lightColorIntensity[2]); // наш белый цвет :3
+
+        if (isDiscoMode)
+        {
+            // Плавно меняем RGB от времени.
+            // Синус бывает от -1 до 1, поэтому делаем * 0.5 + 0.5, чтобы получить чистые цвета от 0 до 1!
+            float r = sin(Time::GetTime() * 1.5f) * 0.5f + 0.5f;
+            float g = sin(Time::GetTime() * 2.0f) * 0.5f + 0.5f;
+            float b = sin(Time::GetTime() * 1.0f) * 0.5f + 0.5f;
+
+            ourShader.SetFloat3("u_LightColor", r, g, b); // наш диско цвет
+
+        }
+        else
+        {
+            ourShader.SetFloat3("u_LightColor", lightColorIntensity[0], lightColorIntensity[1], lightColorIntensity[2]); // наш белый цвет :3
+        }
+
 
         ourShader.SetFloat3("u_ViewPos", camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 
@@ -269,7 +290,7 @@ int main()
 
         // Старый код пульсации цвета (our Color) 
         float TimeValue = Time::GetTime();
-        ourShader.SetFloat4("ourColor", 0.0f, 1.0, 0.0f, 1.0f);
+        ourShader.SetFloat4("ourColor", 1.0f, 1.0, 1.0f, 1.0f);
 
         // АКТИВИРУЕМ ТЕКСТУРУ ПЕРЕД ОТРИСОВКОЙ!
         wallTexture.Bind(0);
@@ -287,7 +308,7 @@ int main()
             float angle = 20.0f * i + 1.0f * Time::GetTime();
             model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
 
-            model = glm::scale(model, glm::vec3(2.0f, CubeScale, 1.0f));
+            model = glm::scale(model, glm::vec3(1.0f, CubeScale, 1.0f));
 
             ourShader.SetMatrix4("u_Model", model);
 
@@ -325,7 +346,7 @@ int main()
         lightModel = glm::translate(lightModel, glm::vec3(lightX, lightY, lightZ));
 
         // Масштабируем кубик лампы, делая его маленьким ( в 5 раз меньше обычного)
-        lightModel = glm::scale(lightModel, glm::vec3(0.2f));
+        lightModel = glm::scale(lightModel, glm::vec3(0.1f));
 
         lightShader.SetMatrix4("u_Model", lightModel);
 
