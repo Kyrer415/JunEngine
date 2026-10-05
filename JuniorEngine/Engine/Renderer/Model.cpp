@@ -102,7 +102,25 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 			indices.push_back(face.mIndices[j]);
 		}
 	}
-	
+	if (mesh->mMaterialIndex >= 0)
+	{
+		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+		// Проверяем, есть ли у материала диффузные текстуры (карта цвета)
+		if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+		{
+			aiString str;
+			material->GetTexture(aiTextureType_DIFFUSE, 0 &str);
+
+			// Склеиваем путь к папке модели и имя файла текстуры 
+			std::string texturePath = m_Directory + "/" + str.C_Str();
+
+
+
+		}
+	}
+
 	// Возвращаем готовый скомпилированный меш 
 	return Mesh(vertices, indices);
 }
+
