@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+﻿cmake_minimum_required(VERSION 3.15)
 
 project(JuniorEngine LANGUAGES CXX)
 
@@ -62,13 +62,18 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     assimp::assimp
 )
 
+# ОЧИЩЕННЫЙ ТАРГЕТ С ПРАВИЛЬНЫМИ ПУТЯМИ (ДВА JuniorEngine)
+add_custom_target(CopyAssets ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/basic.vert" "${CMAKE_BINARY_DIR}/basic.vert"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/basic.frag" "${CMAKE_BINARY_DIR}/basic.frag"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/light.frag" "${CMAKE_BINARY_DIR}/light.frag"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/openGL_Logo.png" "${CMAKE_BINARY_DIR}/openGL_Logo.png"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/UnrealEngine_Logo.png" "${CMAKE_BINARY_DIR}/UnrealEngine_Logo.png"
+    
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/models" "${CMAKE_BINARY_DIR}/models"
 
-add_custom_target(CopyAssets
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/basic.vert"
-        "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/basic.frag"
-        "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/light.frag"
-        "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/openGL_Logo.png"
-        "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/UnrealEngine_Logo.png"
-        "${CMAKE_BINARY_DIR}")
+    COMMENT "Копирование шейдеров, текстур и 3D-моделей в папку сборки..."
+)
+
 add_dependencies(${PROJECT_NAME} CopyAssets)
+
