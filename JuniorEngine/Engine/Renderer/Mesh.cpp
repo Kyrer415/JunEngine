@@ -21,7 +21,7 @@ void Mesh::SetData(const Vertex* vertices, unsigned int vCount, const unsigned i
 	m_IndexCount = iSize / sizeof(unsigned int);
 }
 
-void Mesh::Draw() const
+void Mesh::Draw() 
 {
 	// Если вершин нет, то и рисовать нечего
 	if (m_IndexCount == 0) return;
@@ -35,4 +35,14 @@ void Mesh::Draw() const
 
 	// 3. Отвязываем обратно для безопасности
 	m_VAO.UnBind();
+}
+
+Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices)
+{
+	// запоминаем кол-во индексов для отрисовки
+	m_IndexCount = indices.size();
+
+	// передаём данные в наш VertexArray
+	// .data() возвращает сырой указатель (const Vertex*), а .size() - кол-во элементов!
+	m_VAO.SetData(vertices.data(), vertices.size(), indices.data(), indices.size());
 }

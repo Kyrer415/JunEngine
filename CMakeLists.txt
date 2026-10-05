@@ -34,6 +34,8 @@ add_executable(JuniorEngine
     JuniorEngine/Engine/Renderer/Texture.cpp
     JuniorEngine/Engine/Renderer/Camera.h
     JuniorEngine/Engine/Renderer/Camera.cpp
+    JuniorEngine/Engine/Renderer/Model.h
+    JuniorEngine/Engine/Renderer/Model.cpp
 )
 
 
@@ -48,6 +50,7 @@ find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 find_package(glad REQUIRED) # <-- Ищем Glad в vcpkg
 find_package(imgui REQUIRED) # <-- тут ищем imgui!
+find_package(assimp REQUIRED)
 
 # Линкуем готовые бинарники vcpkg
 target_link_libraries(${PROJECT_NAME} PRIVATE 
@@ -56,6 +59,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     glm::glm
     imgui::imgui
     glad::glad # <-- Подключаем готовый скомпилированный Glad
+    assimp::assimp
 )
 
 

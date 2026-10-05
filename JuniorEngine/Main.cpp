@@ -321,7 +321,7 @@ int main()
             }
             else
             {
-                ourShader.SetFloat("material.ambient", 0.1f);
+                ourShader.SetFloat("material.ambient", 0.01f);
                 ourShader.SetFloat("material.diffuse", 0.8f);
                 ourShader.SetFloat("material.specular", 0.0f);
                 ourShader.SetFloat("material.shininess", 1.0f);
