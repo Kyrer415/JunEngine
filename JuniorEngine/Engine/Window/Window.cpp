@@ -5,6 +5,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+// Выделяем память под статический счетчик окон
+int Window::s_WindowCount = 0;
+
+
 // конструктор: сохраняем настройки и запускаем инициализацию
 Window::Window(int width, int height, const std::string& title) : m_Width(width), m_Height(height), m_Title(title), m_Window(nullptr)
 {

@@ -103,8 +103,16 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 		}
 	}
 
+	aiColor4D diffuseColor(1.0f, 1.0f, 1.0f, 1.0f); // По умолчанию белый
+
 	std::vector<Texture> textures;
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+		// Забираем diffuse цвет из файла .mtl
+		if (material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == AI_SUCCESS)
+		{
+
+		}
 
 	// Проверяем, есть ли у материала диффузные текстуры (карта цвета)
 	if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0)
