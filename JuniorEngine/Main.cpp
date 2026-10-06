@@ -1,5 +1,4 @@
-﻿#include <glad/glad.h>
-#include <imgui.h>
+﻿#include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <glm/glm.hpp>
@@ -8,13 +7,14 @@
 #include <cmath>
 
 #include "Window\Window.h"
-#include "Core\Input.h"
 #include "Renderer\Shader.h" 
 #include "Renderer\Renderer.h"
 #include "Renderer\Mesh.h"
-#include "Core\CoreTime.h"
+#include "Renderer/Model.h"
 #include "Renderer\Texture.h"
 #include "Renderer\Camera.h" // подключили камеру
+#include "Core\CoreTime.h"
+#include "Core\Input.h"
 
 int main()
 {
@@ -84,9 +84,11 @@ int main()
     unsigned int vertexCount = sizeof(vertices) / sizeof(Vertex);
     Mesh Cube(vertices, vertexCount, indices, sizeof(indices));
 
-    // Включаем ТЕСТ глубины для настойщего 3d!
-    glEnable(GL_DEPTH_TEST);
+    // Включаем ТЕСТ глубины для настоящего 3d!
+    renderer.EnableZ();
 
+    // Загружаем наш столик через Assimp
+    Model tableModel("models/Table.obj");
 
     // Создадим объект наей текстуры!
     Texture wallTexture("openGL_logo.png");
@@ -330,6 +332,35 @@ int main()
             Cube.Draw();
 
         }
+
+        // Отрисовка 3д модели
+        ourShader.Use();
+
+        // Строим матрицу трансформации для стола
+        glm::mat4 tableTransform = glm::mat4(1.0f);
+
+        // Свдигаем его чуть чуть вглубб экрана и пониже, чтобы не перекрывал кубы
+        tableTransform = glm::translate(tableTransform, glm::vec3(0.0f, 0.0f, 0.0f));
+
+        // Крутим стол вокруг своей оси от времени
+        tableTransform = glm::rotate(tableTransform, (float)Time::GetTime() * 0.5f, glm::vec3(0.0f, 1.0f, 0.0f));
+
+        // Ставим масштаб(размер)
+        tableTransform = glm::scale(tableTransform, glm::vec3(5.0f));
+
+        // Закидываем матрицу модели в шейдер
+        ourShader.SetMatrix4("u_Model", tableTransform);
+
+        // Настраиваем дефолтный материал для стола (сделаем его матовым)
+        ourShader.SetFloat("material.ambient", 0.1f);
+        ourShader.SetFloat("material.diffuse", 0.8f);
+        ourShader.SetFloat("material.specular", 0.0f);
+        ourShader.SetFloat("material.shininess", 1.0f);
+
+        // Вызваем Draw классса Model, передавая туда шейдер!
+        wallTexture.Bind(0);
+        faceTexture.Bind(1);
+        tableModel.Draw(ourShader);
 
         // Отрисвка кубика для лампы -->
         lightShader.Use();

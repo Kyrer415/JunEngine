@@ -8,3 +8,8 @@ void Renderer::Clear(float r, float g, float b, float a) const
 	// Очищаем буфер цвета (заливаем экран этим цветом)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
+
+void Renderer::EnableZ()
+{
+	glEnable(GL_DEPTH_TEST);
+}

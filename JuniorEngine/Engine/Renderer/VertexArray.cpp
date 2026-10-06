@@ -19,6 +19,25 @@ VertexArray::~VertexArray()
 	if (m_EBO != 0) glDeleteBuffers(1, &m_EBO);
 }
 
+VertexArray::VertexArray(VertexArray&& o) noexcept
+	: m_VAO(o.m_VAO), m_VBO(o.m_VBO), m_EBO(o.m_EBO)
+{
+	o.m_VAO = o.m_VBO = o.m_EBO = 0;
+}
+
+VertexArray& VertexArray::operator=(VertexArray&& o) noexcept
+{
+	if (this != &o)
+	{
+		if (m_VAO) glDeleteVertexArrays(1, &m_VAO);
+		if (m_VBO) glDeleteBuffers(1, &m_VBO);
+		if (m_EBO) glDeleteBuffers(1, &m_EBO);
+		m_VAO = o.m_VAO; m_VBO = o.m_VBO; m_EBO = o.m_EBO;
+		o.m_VAO = o.m_VBO = o.m_EBO = 0;
+	}
+	return *this;
+}
+
 void VertexArray::SetData(const Vertex* vertices, unsigned int vCount, const unsigned int* indices, unsigned int iSize)
 {
 	// 1. Включаем VAO

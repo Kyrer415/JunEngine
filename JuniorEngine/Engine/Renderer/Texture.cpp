@@ -44,6 +44,29 @@ Texture::Texture(const std::string& filePath)
 	stbi_image_free(LocalBuffer);
 }
 
+Texture::Texture(Texture&& o) noexcept
+	: m_ID(o.m_ID), 
+	m_FilePath(std::move(o.m_FilePath)),
+	m_Width(o.m_Width), 
+	m_Height(o.m_Height), 
+	m_BPP(o.m_BPP)
+{
+	o.m_ID = 0;
+}
+
+Texture& Texture::operator=(Texture&& o) noexcept
+{
+	if (this != &o)
+	{
+		if (m_ID != 0) glDeleteTextures(1, &m_ID);
+		m_ID = o.m_ID;
+		m_FilePath = std::move(o.m_FilePath);
+		m_Width = o.m_Width; m_Height = o.m_Height; m_BPP = o.m_BPP;
+		o.m_ID = 0;
+	}
+	return *this;
+}
+
 Texture::~Texture()
 {
 	if (m_ID != 0)

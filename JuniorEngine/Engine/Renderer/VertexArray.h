@@ -11,6 +11,11 @@ public:
 	// Деструктор очистит память вдиеокарты при удалении объекта
 	~VertexArray();
 
+	VertexArray(const VertexArray&) = delete;
+	VertexArray& operator=(const VertexArray&) = delete;
+	VertexArray(VertexArray&& other) noexcept;
+	VertexArray& operator=(VertexArray&& other) noexcept;
+
 	// Загрузить вершины в видеопамятьи настроть атрибуты 
 	void SetData(const Vertex* vertices, unsigned int vCount, const unsigned int* indicdes, unsigned int iSize);
 

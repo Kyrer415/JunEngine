@@ -9,6 +9,14 @@ public:
 	Texture(const std::string& filePath);
 	~Texture();
 
+	// ЗАпрещаем копирование
+	Texture(const Texture&) = delete; // Копировать нельзя!
+	Texture& operator=(const Texture&) = delete; // присваивать копию нельзя!
+
+	// Разрешаем перемещение
+	Texture(Texture&& other) noexcept;
+	Texture& operator=(Texture&& other) noexcept;
+
 	// Включить текстуру перед отрисовкоай меша. slot - это номер текстурного юнита (от 0 до 15)
 	void Bind(unsigned int slot = 0) const;
 	void UnBind() const;

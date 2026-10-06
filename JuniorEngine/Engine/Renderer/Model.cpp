@@ -119,12 +119,12 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 
 			// Создаём объект текстуры и пушим её в локальный вектор меша!
 			Texture diffuseTex(texturePath);
-			textures.push_back(diffuseTex);
+			textures.emplace_back(texturePath);
 
 		}
 	}
 
 	// Возвращаем готовый скомпилированный меш 
-	return Mesh(vertices, indices, textures);
+	return Mesh(vertices, indices, std::move(textures));
 }
 
