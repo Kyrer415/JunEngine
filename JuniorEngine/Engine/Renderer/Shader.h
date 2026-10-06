@@ -13,6 +13,11 @@ public:
 	// Деструктор удалит шейдерную программу из памяти видеокарты
 	~Shader();
 
+	Shader(const Shader&) = delete;
+	Shader& operator=(const Shader&) = delete;
+	Shader(Shader&& other) noexcept;
+	Shader& operator=(Shader&& other) noexcept;
+
 	// Активация шейдерной программы (замена glUseProgram)
 	void Use() const;
 

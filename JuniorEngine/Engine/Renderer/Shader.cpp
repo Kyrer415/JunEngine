@@ -28,6 +28,23 @@ Shader::~Shader()
 	}
 }
 
+Shader::Shader(Shader&& o) noexcept
+	:m_ID(o.m_ID)
+{
+	o.m_ID = 0;
+}
+
+Shader& Shader::operator=(Shader&& o) noexcept
+{
+	if (this != &o)
+	{
+		if (m_ID) glDeleteProgram(m_ID);
+		m_ID = o.m_ID;
+		o.m_ID = 0;
+	}
+	return *this;
+}
+
 void Shader::Use() const
 {
 	// Активируем шейдерную программу для отрисвки
