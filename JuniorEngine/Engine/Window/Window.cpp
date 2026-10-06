@@ -31,6 +31,7 @@ Window& Window::operator=(Window&& o) noexcept
 		m_Window = o.m_Window;
 		o.m_Window = 0;
 	}
+	return *this;
 }
 
 bool Window::Init()
