@@ -13,6 +13,11 @@ public:
 	// конструктор: принимает размеры и заголовок окна
 	Window(int width, int height, const std::string& title);
 
+	Window(const Window&) = delete;
+	Window& operator=(const Window&) = delete;
+	Window(Window&&) noexcept;
+	Window& operator=(Window&&) noexcept;
+
 	// деструктор: очистит ресурсы при закрытии приложения
 	~Window();
 
@@ -44,6 +49,7 @@ private:
 private:
 	int m_Width;
 	int m_Height;
+	static int s_WindowCount; // счётчик оставшихся окон :>
 	std::string m_Title;
 
 	// Указатель на реальное окно GLFW

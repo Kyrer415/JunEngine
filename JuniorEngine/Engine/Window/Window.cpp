@@ -14,17 +14,38 @@ Window::Window(int width, int height, const std::string& title) : m_Width(width)
 // Деструктор: сработаем сам, когда окно закроется 
 Window::~Window()
 {
-	Shutdown();
+	Shutdown(); // тут есть проверка на валидность if (m_Window) так что всё гуд
+}
+
+Window::Window(Window&& o) noexcept
+	: m_Width(std::move(o.m_Width)), m_Height(std::move(o.m_Height)), m_Title(std::move(o.m_Title)), m_Window(o.m_Window)
+{
+	o.m_Window = 0;
+}
+
+Window& Window::operator=(Window&& o) noexcept
+{
+	if (this != &o)
+	{
+		if (m_Window) Shutdown();
+		m_Window = o.m_Window;
+		o.m_Window = 0;
+	}
 }
 
 bool Window::Init()
 {
-	// 1. Инициализация GLFW
-	if (!glfwInit())
+	if (s_WindowCount == 0)
 	{
-		std::cerr << "Не удалось инициилизировать GLFW";
-		return false;
+		// 1. Инициализация GLFW
+		if (!glfwInit())
+		{
+			std::cerr << "Не удалось инициилизировать GLFW";
+			return false;
+		}
+		s_WindowCount++;
 	}
+
 
 	// Настройки OpenGL 3.3 Core
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -70,8 +91,13 @@ void Window::Shutdown()
 	if (m_Window)
 	{
 		glfwDestroyWindow(m_Window);
+		m_Window = nullptr;
+		s_WindowCount--;
+		if (s_WindowCount == 0)
+		{
+			glfwTerminate();
+		}
 	}
-	glfwTerminate();
 }
 void Window::Close()
 {
