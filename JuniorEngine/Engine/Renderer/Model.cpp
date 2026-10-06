@@ -80,7 +80,7 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 		}
 
 		// Текстурные координаты (UV)
-		if (mesh->mTextureCoords[0]) // есть у меша текстура?0
+		if (mesh->mTextureCoords[0]) // есть у меша текстура?
 		{
 			vertex.TexCoords.x = mesh->mTextureCoords[0][i].x;
 			vertex.TexCoords.y = mesh->mTextureCoords[0][i].y;
@@ -102,6 +102,8 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 			indices.push_back(face.mIndices[j]);
 		}
 	}
+
+	std::vector<Texture> textures;
 	if (mesh->mMaterialIndex >= 0)
 	{
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
@@ -110,17 +112,19 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 		if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0)
 		{
 			aiString str;
-			material->GetTexture(aiTextureType_DIFFUSE, 0 &str);
+			material->GetTexture(aiTextureType_DIFFUSE, 0, &str);
 
 			// Склеиваем путь к папке модели и имя файла текстуры 
 			std::string texturePath = m_Directory + "/" + str.C_Str();
 
-
+			// Создаём объект текстуры и пушим её в локальный вектор меша!
+			Texture diffuseTex(texturePath);
+			textures.push_back(diffuseTex);
 
 		}
 	}
 
 	// Возвращаем готовый скомпилированный меш 
-	return Mesh(vertices, indices);
+	return Mesh(vertices, indices, textures);
 }
 

@@ -12,6 +12,15 @@ Mesh::Mesh(const Vertex* vertices, unsigned int vCount, const unsigned int* indi
 	SetData(vertices, vCount, indices, iSize);
 }
 
+// Новый конструктор с текстурами!
+Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures)
+{
+	m_IndexCount = indices.size();
+	m_Textures = textures; // копируем текстуры внутрь меша
+
+	m_VAO.SetData(vertices.data(), vertices.size(), indices.data(), indices.size());
+}
+
 void Mesh::SetData(const Vertex* vertices, unsigned int vCount, const unsigned int* indices, unsigned int iSize)
 {
 	// Загружаем данные в наш VertexArray
@@ -21,10 +30,16 @@ void Mesh::SetData(const Vertex* vertices, unsigned int vCount, const unsigned i
 	m_IndexCount = iSize / sizeof(unsigned int);
 }
 
-void Mesh::Draw() 
+void Mesh::Draw() const
 {
 	// Если вершин нет, то и рисовать нечего
 	if (m_IndexCount == 0) return;
+
+	for (unsigned int i = 0; i < m_Textures.size(); i++)
+	{
+		// Передаём индекс слота (0,1,2...), наш класс текстуры вызовёт glActiveTexture внутри!
+		m_Textures[i].Bind(i);
+	}
 
 	// 1. Активируем буферы этого меша
 	m_VAO.Bind();
@@ -35,14 +50,4 @@ void Mesh::Draw()
 
 	// 3. Отвязываем обратно для безопасности
 	m_VAO.UnBind();
-}
-
-Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices)
-{
-	// запоминаем кол-во индексов для отрисовки
-	m_IndexCount = indices.size();
-
-	// передаём данные в наш VertexArray
-	// .data() возвращает сырой указатель (const Vertex*), а .size() - кол-во элементов!
-	m_VAO.SetData(vertices.data(), vertices.size(), indices.data(), indices.size());
 }
