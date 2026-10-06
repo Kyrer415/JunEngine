@@ -104,24 +104,20 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 	}
 
 	std::vector<Texture> textures;
-	if (mesh->mMaterialIndex >= 0)
-	{
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-		// Проверяем, есть ли у материала диффузные текстуры (карта цвета)
-		if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0)
-		{
-			aiString str;
-			material->GetTexture(aiTextureType_DIFFUSE, 0, &str);
+	// Проверяем, есть ли у материала диффузные текстуры (карта цвета)
+	if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+	{
+		aiString str;
+		material->GetTexture(aiTextureType_DIFFUSE, 0, &str);
 
-			// Склеиваем путь к папке модели и имя файла текстуры 
-			std::string texturePath = m_Directory + "/" + str.C_Str();
+		// Склеиваем путь к папке модели и имя файла текстуры 
+		std::string texturePath = m_Directory + "/" + str.C_Str();
 
-			// Создаём объект текстуры и пушим её в локальный вектор меша!
-			Texture diffuseTex(texturePath);
-			textures.emplace_back(texturePath);
+		// пушим путь в локальный вектор меша!
+		textures.emplace_back(texturePath);
 
-		}
 	}
 
 	// Возвращаем готовый скомпилированный меш 
