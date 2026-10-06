@@ -156,11 +156,6 @@ int main()
         // 3. Обновляем позицию камеры на основе клавиатуры и DeltaTime!
         camera.ProcessInput(window, Time::GetDeltaTime());
 
-        // 5. Обработка мыши
-        double mouseX, mouseY;
-        // запрашиваем у GLFW координаты курсора
-        glfwGetCursorPos(window.GetNativeWindow(), &mouseX, &mouseY);
-
         // Переключаем режим на кнопку LEFT ALT ( код 342 в GLFW / Input), проверяя что с пролшлого нажатия прошло больше 0.2 сек
         if (Input::IsKeyPressed(window, 342))
         {
@@ -189,7 +184,9 @@ int main()
         // Обрабатываем движение камеры только если мышь не занята интерфейсом!
         if (!isUIFocused)
         {
+            // объявляем координаты мыши!
             double mouseX, mouseY;
+            // запрашиваем у GLFW координаты курсора
             glfwGetCursorPos(window.GetNativeWindow(), &mouseX, &mouseY);
 
             if (firstMouse)
