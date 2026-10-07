@@ -2,7 +2,8 @@
 
 #include <string>
 #include <vector>
-#include "Mesh.h" // тут лежат структура вершин vertex и класс mesh
+#include "Renderer/Mesh.h" // тут лежат структура вершин vertex и класс mesh
+#include "Core/Transform.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -18,6 +19,8 @@ public:
 	// Метож отрисовки всей модели (она может состоять из нескольких мешей)
 	void Draw(const Shader& shader) ;
 
+	Transform& GetTransform() { return m_Transform; }
+
 private:
 	// Функция загрузки модели через Assimp
 	void LoadModel(const std::string& path);
@@ -32,5 +35,6 @@ private:
 	// Модель может состоять ищ мнжества отдельных кусков
 	std::vector<Mesh> m_Meshes;
 	std::string m_Directory; // Папка, где лежит модель ( нужна, чтобы искать текстуры рядом)
+	Transform m_Transform;
 };
 

@@ -217,6 +217,17 @@ int main()
         ImGui::Text("JuniorEngine Debag Menu");
         ImGui::Separator();
 
+        // Управление трансформацией стола
+        ImGui::Text("Table Object Transform:");
+
+        // Достаём ссылку на наш трансформ один раз, чтобы не спамить вызовом метода
+        Transform& tableTransform = tableModel.GetTransform();
+
+        ImGui::SliderFloat3("Table Position", &tableTransform.Position.x, -10.0f, 10.0f);
+        ImGui::SliderFloat3("Table Rotation", &tableTransform.Rotation.x, 0.0f, 360.0f );
+        ImGui::SliderFloat3("Table Scale", &tableTransform.Scale.x, 0.1f, 5.0f);
+        ImGui::Separator();
+
         // 1. Управление материалом кубов
         ImGui::Text("Material Settings:");
         ImGui::SliderFloat("Shininess", &testShininess, 1.0f, 256.0f);
@@ -333,20 +344,10 @@ int main()
         // Отрисовка 3д модели
         ourShader.Use();
 
-        // Строим матрицу трансформации для стола
-        glm::mat4 tableTransform = glm::mat4(1.0f);
-
-        // Свдигаем его чуть чуть вглубб экрана и пониже, чтобы не перекрывал кубы
-        tableTransform = glm::translate(tableTransform, glm::vec3(0.0f, 0.0f, 0.0f));
-
-        // Крутим стол вокруг своей оси от времени
-        tableTransform = glm::rotate(tableTransform, (float)Time::GetTime() * 0.5f, glm::vec3(0.0f, 1.0f, 0.0f));
-
-        // Ставим масштаб(размер)
-        tableTransform = glm::scale(tableTransform, glm::vec3(5.0f));
+        glm::mat4 tableModelMatrix = tableModel.GetTransform().GetModelMatrix();
 
         // Закидываем матрицу модели в шейдер
-        ourShader.SetMatrix4("u_Model", tableTransform);
+        ourShader.SetMatrix4("u_Model", tableModelMatrix);
 
         // Настраиваем дефолтный материал для стола (сделаем его матовым)
         ourShader.SetFloat("material.ambient", 0.1f);
@@ -355,8 +356,6 @@ int main()
         ourShader.SetFloat("material.shininess", 1.0f);
 
         // Вызваем Draw классса Model, передавая туда шейдер!
-        wallTexture.Bind(0);
-        faceTexture.Bind(1);
         tableModel.Draw(ourShader);
 
         // Отрисвка кубика для лампы -->

@@ -20,6 +20,7 @@ add_executable(JuniorEngine
     JuniorEngine/Engine/Core/CoreTime.cpp
     JuniorEngine/Engine/Core/input.h
     JuniorEngine/Engine/Core/input.cpp
+    JuniorEngine/Engine/Core/Transform.h
     JuniorEngine/Engine/Window/Window.h
     JuniorEngine/Engine/Window/Window.cpp
     JuniorEngine/Engine/Renderer/Renderer.h
