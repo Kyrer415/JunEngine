@@ -33,6 +33,9 @@ Window& Window::operator=(Window&& o) noexcept
 	{
 		if (m_Window) Shutdown();
 		m_Window = o.m_Window;
+		m_Width = o.m_Width;
+		m_Height = o.m_Height;
+		m_Title = std::move(o.m_Title);
 		o.m_Window = 0;
 	}
 	return *this;
@@ -48,9 +51,8 @@ bool Window::Init()
 			std::cerr << "Не удалось инициилизировать GLFW";
 			return false;
 		}
-		s_WindowCount++;
 	}
-
+	s_WindowCount++;
 
 	// Настройки OpenGL 3.3 Core
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
