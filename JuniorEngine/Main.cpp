@@ -41,48 +41,8 @@ int main()
     Shader ourShader("basic.vert", "basic.frag");
     Shader lightShader("basic.vert", "light.frag"); // шейдер для поинтлайта
 
-    // Массив вершин куба: Координаты (X,Y,Z) + Текстурные координаты (U,V)
-        // Массив вершин куба: Позиция (X,Y,Z) + Текстура (U,V) + Нормали (nX,nY,nZ)
-    Vertex vertices[] = {
-        // Позиция                     // Текстура    // Нормаль
-        { glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f) },
-        { glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f) },
-        { glm::vec3(0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f,  0.0f, -1.0f) },
-        { glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(0.0f,  0.0f, -1.0f) },
-        { glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f) },
-        { glm::vec3(0.5f, -0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f) },
-        { glm::vec3(0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f) },
-        { glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f) },
-        { glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(-1.0f,  0.0f, 0.0f) },
-        { glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(-1.0f,  0.0f, 0.0f) },
-        { glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(-1.0f,  0.0f, 0.0f) },
-        { glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(-1.0f,  0.0f, 0.0f) },
-        { glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(1.0f,  0.0f, 0.0f) },
-        { glm::vec3(0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(1.0f,  0.0f, 0.0f) },
-        { glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(1.0f,  0.0f, 0.0f) },
-        { glm::vec3(0.5f, -0.5f, 0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(1.0f,  0.0f, 0.0f) },
-        { glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(0.0f,  -1.0f, 0.0f) },
-        { glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f,  -1.0f, 0.0f) },
-        { glm::vec3(0.5f, -0.5f, 0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(0.0f,  -1.0f, 0.0f) },
-        { glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f,  -1.0f, 0.0f) },
-        { glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(0.0f,  1.0f, 0.0f) },
-        { glm::vec3(0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f,  1.0f, 0.0f) },
-        { glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(0.0f,  1.0f, 0.0f) },
-        { glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f,  1.0f, 0.0f) },
-    };
-
-    // Индексы для сборки 6 граней (каждая грань состоит из 2-х треугольников)
-    unsigned int indices[] = {
-         0,  1,  2,   2,  3,  0,
-         4,  5,  6,   6,  7,  4,
-         8,  9, 10,  10, 11,  8,
-        12, 13, 14,  14, 15, 12,
-        16, 17, 18,  18, 19, 16,
-        20, 21, 22,  22, 23, 20
-    };
-
-    unsigned int vertexCount = sizeof(vertices) / sizeof(Vertex);
-    Mesh Cube(vertices, vertexCount, indices, sizeof(indices));
+    // Создаём меш с помощью нашего static метода!
+    Mesh cube = Mesh::CreateCube();
 
     // Включаем ТЕСТ глубины для настоящего 3d!
     renderer.EnableZ();
@@ -148,7 +108,7 @@ int main()
         Time::Update();
 
         // Обработка ввода: если нажат ESCAPE (код 256), закрываем движок!
-        if (Input::IsKeyPressed(window, 256))
+        if (Input::IsKeyPressed(window, GLFW_KEY_ESCAPE))
         {
             window.Close();
         }
@@ -156,8 +116,8 @@ int main()
         // 3. Обновляем позицию камеры на основе клавиатуры и DeltaTime!
         camera.ProcessInput(window, Time::GetDeltaTime());
 
-        // Переключаем режим на кнопку LEFT ALT ( код 342 в GLFW / Input), проверяя что с пролшлого нажатия прошло больше 0.2 сек
-        if (Input::IsKeyPressed(window, 342))
+        // Переключаем режим на кнопку LEFT ALT , проверяя что с пролшлого нажатия прошло больше 0.2 сек
+        if (Input::IsKeyPressed(window, GLFW_KEY_LEFT_ALT))
         {
             if (altKeyReleased)
             {
