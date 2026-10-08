@@ -53,3 +53,50 @@ void Mesh::Draw() const
 	// 3. Отвязываем обратно для безопасности
 	m_VAO.UnBind();
 }
+
+Mesh Mesh::CreateCube()
+{
+	Vertex vertices[] = {
+		// Позиция                     // Текстура    // Нормаль
+		{ glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f) },
+		{ glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(0.0f,  0.0f, -1.0f) },
+		{ glm::vec3(0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f,  0.0f, -1.0f) },
+		{ glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(0.0f,  0.0f, -1.0f) },
+		{ glm::vec3(-0.5f, -0.5f,  0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f) },
+		{ glm::vec3(0.5f, -0.5f,  0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f) },
+		{ glm::vec3(0.5f,  0.5f,  0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f) },
+		{ glm::vec3(-0.5f,  0.5f,  0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f) },
+		{ glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(-1.0f,  0.0f, 0.0f) },
+		{ glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(-1.0f,  0.0f, 0.0f) },
+		{ glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(-1.0f,  0.0f, 0.0f) },
+		{ glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(-1.0f,  0.0f, 0.0f) },
+		{ glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(1.0f,  0.0f, 0.0f) },
+		{ glm::vec3(0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(1.0f,  0.0f, 0.0f) },
+		{ glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(1.0f,  0.0f, 0.0f) },
+		{ glm::vec3(0.5f, -0.5f, 0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(1.0f,  0.0f, 0.0f) },
+		{ glm::vec3(-0.5f, -0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(0.0f,  -1.0f, 0.0f) },
+		{ glm::vec3(0.5f, -0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f,  -1.0f, 0.0f) },
+		{ glm::vec3(0.5f, -0.5f, 0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(0.0f,  -1.0f, 0.0f) },
+		{ glm::vec3(-0.5f, -0.5f, 0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f,  -1.0f, 0.0f) },
+		{ glm::vec3(-0.5f, 0.5f, -0.5f), glm::vec2(0.0f, 1.0f), glm::vec3(0.0f,  1.0f, 0.0f) },
+		{ glm::vec3(0.5f, 0.5f, -0.5f), glm::vec2(1.0f, 1.0f), glm::vec3(0.0f,  1.0f, 0.0f) },
+		{ glm::vec3(0.5f, 0.5f, 0.5f), glm::vec2(1.0f, 0.0f), glm::vec3(0.0f,  1.0f, 0.0f) },
+		{ glm::vec3(-0.5f, 0.5f, 0.5f), glm::vec2(0.0f, 0.0f), glm::vec3(0.0f,  1.0f, 0.0f) },
+	};
+
+	// Индексы для сборки 6 граней (каждая грань состоит из 2-х треугольников)
+	unsigned int indices[] = {
+		 0,  1,  2,   2,  3,  0,
+		 4,  5,  6,   6,  7,  4,
+		 8,  9, 10,  10, 11,  8,
+		12, 13, 14,  14, 15, 12,
+		16, 17, 18,  18, 19, 16,
+		20, 21, 22,  22, 23, 20
+	};
+
+	// считаём сколько вершин у нас
+	unsigned int vertexCount = sizeof(vertices) / sizeof(Vertex);
+
+	// вовзращаем созданный меш(вершины, кол-во вершин, соединения, вес одного соединения)
+	return Mesh(vertices, vertexCount, indices, sizeof(indices));
+}

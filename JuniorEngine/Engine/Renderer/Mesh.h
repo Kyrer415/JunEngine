@@ -24,6 +24,8 @@ public:
 	Mesh(const Vertex* vertices, unsigned int vCount, const unsigned int* indices, unsigned int iSize);
 	Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices,std::vector<Texture> textures);
 
+	static Mesh CreateCube();
+
 	// Метод для загрузки или обновления данных
 	void SetData(const Vertex* vertices, unsigned int vCount, const unsigned int* indices, unsigned int iSize);
 
