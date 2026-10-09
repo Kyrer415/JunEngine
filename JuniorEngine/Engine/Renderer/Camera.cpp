@@ -66,3 +66,22 @@ void Camera::UpdateCameraVectors()
 	// Полученный вектор делаем единичным (нормализуем)
 	m_Forward = glm::normalize(forward);
 }
+
+void Camera::Update(const Window& window, float deltaTime)
+{
+	double mouseX, mouseY;
+	glfwGetCursorPos(window.GetNativeWindow(), &mouseX, &mouseY);
+	if (m_FirstMouse)
+	{
+		m_LastX = (float)mouseX;
+		m_LastY = (float)mouseY;
+		m_FirstMouse = false;
+	}
+	float xOffset = (float)mouseX - m_LastX;
+	float yOffset = m_LastY - (float)mouseY; // Инвертируем Y, так как в OpenGL координаты идут сверху вниз!
+	m_LastX = (float)mouseX;
+	m_LastY = (float)mouseY;
+	ProcessMouseMovement(xOffset, yOffset); // Повернули голову
+	ProcessInput(window, deltaTime);        // Подвигали ногами (клавиатура)
+
+}

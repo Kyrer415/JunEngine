@@ -82,11 +82,6 @@ int main()
     // 2. Прячем курсор мыши и запираем в окне
     window.DisableCursor();
 
-    // 3. Перемещаем длдя отслеживания перемещеия мыши
-    // Изначально ставим их в центр экрана (800x600 -> 400x300)
-    float lastX = window.GetWidth() / 2.0f;
-    float lastY = window.GetHeight() / 2.0f;
-    bool firstMouse = true; // Флаг, чтобы избежать дикого скачка камеры при первом кадре
     bool isUIFocused = false; // По умолчанию мы в режиме полёта(курсор зафиксирован и спрятан)
     bool altKeyReleased = true; // Предохранитель от зажимания
 
@@ -113,9 +108,6 @@ int main()
             window.Close();
         }
 
-        // 3. Обновляем позицию камеры на основе клавиатуры и DeltaTime!
-        camera.ProcessInput(window, Time::GetDeltaTime());
-
         // Переключаем режим на кнопку LEFT ALT , проверяя что с пролшлого нажатия прошло больше 0.2 сек
         if (Input::IsKeyPressed(window, GLFW_KEY_LEFT_ALT))
         {
@@ -129,12 +121,10 @@ int main()
                 else
                     window.DisableCursor();
 
-                // небольшая задержка, чтобы кнопка не спамила переключением за один кадр
-                firstMouse = true; // Сбрасываем скачок камеры при возврате
+                camera.ResetFirstMouse(); // сбрасываем чтобы камера не прыгнула при возврате в режим полёта
 
                 altKeyReleased = false; // блокируем повторные нажаития
             }
-
         }
         else
         {
@@ -144,27 +134,9 @@ int main()
         // Обрабатываем движение камеры только если мышь не занята интерфейсом!
         if (!isUIFocused)
         {
-            // объявляем координаты мыши!
-            double mouseX, mouseY;
-            // запрашиваем у GLFW координаты курсора
-            glfwGetCursorPos(window.GetNativeWindow(), &mouseX, &mouseY);
 
-            if (firstMouse)
-            {
-                lastX = (float)mouseX;
-                lastY = (float)mouseY;
-                firstMouse = false;
-            }
-            // Cчитаем смещение мыши между текущим и прошлым кадром
-            float xOffset = (float)mouseX - lastX;
-            // Инвертируем Y, так как в GLFW координаты экрна идут сверху вниз, а в 3D снизу вверх
-            float yOffset = lastY - (float)mouseY;
-            // Запоминаем текущие координаты как "Прошлые" для след. кадра
-            lastX = (float)mouseX;
-            lastY = (float)mouseY;
+            camera.Update(window, Time::GetDeltaTime());
 
-            // Передаём дельту перемещения в класс камеры
-            camera.ProcessMouseMovement(xOffset, yOffset);
         }
 
         // Старт кадра ImGui 
@@ -297,7 +269,7 @@ int main()
                 ourShader.SetFloat("material.shininess", 1.0f);
             }
 
-            Cube.Draw();
+            cube.Draw();
 
         }
 
@@ -337,7 +309,7 @@ int main()
 
         lightShader.SetMatrix4("u_Model", lightModel);
 
-        Cube.Draw();
+        cube.Draw();
 
         // Финальный рендер кадра ImGui на экран
         ImGui::Render();

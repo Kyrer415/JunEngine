@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include <glm/glm.hpp>
-#include<glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 class Window; // Forward Decalration
 
@@ -22,6 +22,10 @@ public:
 	// Метод для мышки! принимает смещение мыши по x и y
 	void ProcessMouseMovement(float xOffset, float yOffset);
 
+	void Update(const Window& window, float deltaTime);
+
+	void ResetFirstMouse() { m_FirstMouse = true; }
+
 private:
 	// Внутренний метод, который пересчитывает вектор m_Forward из углов Yaw\Pitch
 	void UpdateCameraVectors();
@@ -36,4 +40,8 @@ private:
 	float m_Yaw; // Угол наклона влево-вправо
 	float m_Pitch; // Угол наколна вверх-вниз
 	float m_Sensitivity; // Чуствительность мыши
+
+	float m_LastY { 0.0f };
+	float m_LastX { 0.0f};
+	bool m_FirstMouse = true;
 };
