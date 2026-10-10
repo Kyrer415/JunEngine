@@ -7,8 +7,7 @@ in vec3 FragPos; // Принимаем мировую позицию точки
 
 // Специальный тип данных для текстуры (Ссэмплер)
 uniform sampler2D texture1;
-uniform sampler2D texture2;
-uniform vec4 ourColor; // пулс цвет из c++
+uniform sampler2D texture2; 
 
 struct Material
 {
@@ -26,7 +25,7 @@ uniform vec3 u_ViewPos; // наша позиция камеры передаём
 void main()
 {
 	// Читаем цвет пикселя из смешаных текстур ue и opengl
-	vec4 TexColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.2) * ourColor;
+	vec4 TexColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.2);
 
 	// 1. РАСЧЁТ AMBIENT (фоновое освещение)
 	// Просто даём 10% базовой яркости (0.1), чтобы тени не были провально чёрными
