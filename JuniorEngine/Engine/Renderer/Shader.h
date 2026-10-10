@@ -4,6 +4,8 @@
 #include <string>
 #include <unordered_map> // 1. Подключаем хэш-таблицу
 
+struct Material;
+
 class Shader
 {
 public:
@@ -20,6 +22,8 @@ public:
 
 	// Активация шейдерной программы (замена glUseProgram)
 	void Use() const;
+
+	void SetMaterial(const std::string& name, const Material& material) const;
 
 	void SetMatrix4(const std::string& name, const glm::mat4& matrix) const;
 	void SetMatrix3(const std::string& name, const glm::mat3& matrix) const;

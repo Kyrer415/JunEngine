@@ -1,4 +1,5 @@
 ﻿#include "Renderer\Shader.h"
+#include "Core/Material.h"
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <fstream>
@@ -209,7 +210,7 @@ void Shader::SetMatrix3(const std::string& name, const glm::mat3& matrix) const
 	if (Location != -1) // если он равен -1 значит порта несуществует 
 	{
 		// Передаём матрицу 3x3 на видеокарту
-		glUniformMatrix4fv(Location, 1, GL_FALSE, glm::value_ptr(matrix));
+		glUniformMatrix3fv(Location, 1, GL_FALSE, glm::value_ptr(matrix));
 	}
 }
 
@@ -221,4 +222,12 @@ void Shader::SetInt(const std::string& name, int value) const
 	{
 		glUniform1i(Location, value);
 	}
+}
+
+void Shader::SetMaterial(const std::string& name, const Material& m) const
+{
+	SetFloat(name + ".ambient", m.ambient);
+	SetFloat(name + ".diffuse", m.diffuse);
+	SetFloat(name + ".specular", m.specular);
+	SetFloat(name + ".shininess", m.shininess);
 }
