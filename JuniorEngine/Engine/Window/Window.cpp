@@ -1,5 +1,6 @@
 ﻿#include "Window\Window.h"
 #include <iostream>
+#include <stdexcept>
 
 // GLAD строго перед GLFW!
 #include <glad/glad.h>
@@ -10,9 +11,11 @@ int Window::s_WindowCount = 0;
 
 
 // конструктор: сохраняем настройки и запускаем инициализацию
-Window::Window(int width, int height, const std::string& title) : m_Width(width), m_Height(height), m_Title(title), m_Window(nullptr)
+Window::Window(int width, int height, const std::string& title) 
+	: m_Width(width), m_Height(height), m_Title(title), m_Window(nullptr)
 {
-	Init();
+	if (!Init()) 
+		throw std::runtime_error("Window init failed");
 }
 
 // Деструктор: сработаем сам, когда окно закроется 
@@ -66,7 +69,9 @@ bool Window::Init()
 	if (!m_Window)
 	{
 		std::cerr << "Не удалось создать окно GLFW!" << std::endl;
-		glfwTerminate();
+		s_WindowCount--;
+		if (s_WindowCount == 0)
+			glfwTerminate();
 		return false;
 	}
 	glfwMakeContextCurrent(m_Window);
@@ -75,6 +80,7 @@ bool Window::Init()
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		std::cerr << "Не удалось инициилизировать GLAD!" << std::endl;
+		Shutdown();
 		return false;
 	}
 
