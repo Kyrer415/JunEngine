@@ -124,7 +124,7 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 		std::string texturePath = m_Directory + "/" + str.C_Str();
 
 		// пушим путь в локальный вектор меша!
-		textures.emplace_back(texturePath);
+		textures.emplace_back(Texture::LoadImageFromDisk(texturePath));
 
 	}
 

@@ -11,8 +11,8 @@ Application::Application()
 	m_ImGui(m_Window.GetNativeWindow()), // Передаем нативное окно в конструктор ImGuiManager!
 	m_Settings(SceneSettings()),
     m_CubeMesh(Mesh::CreateCube()),
-    m_WallTexture("openGL_logo.png"),
-    m_FaceTexture("UnrealEngine_Logo.png"),
+    m_WallTexture(Texture::LoadImageFromDisk("openGL_logo.png")),
+    m_FaceTexture(Texture::LoadImageFromDisk("UnrealEngine_Logo.png")),
     m_TableMaterial{ 0.1f, 0.8f, 0.0f, 1.0f }
 
 {

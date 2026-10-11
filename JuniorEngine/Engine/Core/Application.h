@@ -23,7 +23,6 @@ public:
 
 private:
 	void Init();
-	void ShutDown();
 
 	Window m_Window;
 	Renderer m_Renderer;

@@ -1,12 +1,23 @@
 ﻿#pragma once
 
 #include <string>
+#include <memory>
+
+struct StbiDeleter { void operator()(unsigned char* p) const; }; 
+
+struct ImageData
+{
+	std::unique_ptr<unsigned char, StbiDeleter> Pixels;
+	int Width{ 0 };
+	int Height{ 0 };
+	int Channels{ 0 };
+};
 
 class Texture
 {
 public:
-	// Конструктор принимает путь к файлу картинки 
-	Texture(const std::string& filePath);
+	// Конструктор принимает структуру данных(пиксели, размеры, каналы)
+	Texture(const ImageData& data);
 	~Texture();
 
 	// ЗАпрещаем копирование
@@ -21,9 +32,12 @@ public:
 	void Bind(unsigned int slot = 0) const;
 	void UnBind() const;
 
+	static ImageData LoadImageFromDisk(const std::string& filePath);
+
+	static void SetFlipVerticallyOnLoad(bool flip);
+
 private:
 	unsigned int m_ID; // Уникальный ID тексуры на видеокарте
-	std::string m_FilePath; // путь к файлу
 	int m_Width, m_Height; // Размеры картинки в пикселях
-	int m_BPP; // Bits Per Pixel (кол-во каналов цвета например RGB или RGBA
+	int m_Channels; //  кол-во каналов цвета например RGB или RGBA
 };

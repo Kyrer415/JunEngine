@@ -5,22 +5,10 @@
 #include <glad/glad.h>
 #include <iostream>
 
-Texture::Texture(const std::string& filePath)
-	: m_ID(0), m_FilePath(filePath), m_Width(0), m_Height(0), m_BPP(0)
+Texture::Texture(const ImageData& data)
+	: m_ID(0), m_Width(data.Width), m_Height(data.Height), m_Channels(data.Channels)
 {
-	// OpenGL считывает пиксели снизу вверх, а картинки на диске хранятся сверху вниз.
-	// Эта строчка переворачивает картинку при загрузке, чтобы она была вверх ногами!
-	stbi_set_flip_vertically_on_load(1);
-	
-	// Загружаем пиксели картинки в оперативную памчять(CPU)
-	// 4. означает что мы принудительно просим выдать нам 4 канала (RGBA)
-	unsigned char* LocalBuffer = stbi_load(filePath.c_str(), &m_Width, &m_Height, &m_BPP, 4);
-
-	if (!LocalBuffer)
-	{
-		std::cerr << "Ошибка: Не удалось загрузить текстуру по пути:" << filePath << std::endl;
-		return;
-	}
+	if (!data.Pixels) { std::cerr << "Ошибка: Текстура равна нулю!" << std::endl; return; }
 
 	// Генерируем ID для текстуры на видеократе
 	glGenTextures(1, &m_ID);
@@ -35,21 +23,17 @@ Texture::Texture(const std::string& filePath)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
 	// ВАЖНО: Копируем пиксели из оперативки (LocalBuffer) в видеопамять (GPU)
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, LocalBuffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data.Pixels.get());
 
 	// отвзяываем текстуру
 	glBindTexture(GL_TEXTURE_2D, 0);
-	
-	// Чистим дубликат в оперативной памяти так как в VRAM уже текстуры закинуты!
-	stbi_image_free(LocalBuffer);
 }
 
 Texture::Texture(Texture&& o) noexcept
 	: m_ID(o.m_ID), 
-	m_FilePath(std::move(o.m_FilePath)),
 	m_Width(o.m_Width), 
 	m_Height(o.m_Height), 
-	m_BPP(o.m_BPP)
+	m_Channels(o.m_Channels)
 {
 	o.m_ID = 0;
 }
@@ -60,8 +44,7 @@ Texture& Texture::operator=(Texture&& o) noexcept
 	{
 		if (m_ID != 0) glDeleteTextures(1, &m_ID);
 		m_ID = o.m_ID;
-		m_FilePath = std::move(o.m_FilePath);
-		m_Width = o.m_Width; m_Height = o.m_Height; m_BPP = o.m_BPP;
+		m_Width = o.m_Width; m_Height = o.m_Height; m_Channels = o.m_Channels;
 		o.m_ID = 0;
 	}
 	return *this;
@@ -86,4 +69,29 @@ void Texture::Bind(unsigned int slot) const
 void Texture::UnBind() const
 {
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+ImageData Texture::LoadImageFromDisk(const std::string& filePath)
+{
+	ImageData data;
+	// Флип включается один раз в main (Texture::SetFlipVerticallyOnLoad), это глобальная настройка stb
+	// Загружаем пиксели картинки в оперативную памчять(CPU)
+	// 4. означает что мы принудительно просим выдать нам 4 канала (RGBA)
+	data.Pixels.reset(stbi_load(filePath.c_str(), &data.Width, &data.Height, &data.Channels, 4));
+
+	if (!data.Pixels)
+	{
+		std::cerr << "Ошибка: Не удалось загрузить текстуру по пути: " << filePath << std::endl;
+	}
+	return data;
+}
+
+void StbiDeleter::operator()(unsigned char* p) const
+{
+	stbi_image_free(p);
+}
+
+void Texture::SetFlipVerticallyOnLoad(bool flip)
+{
+	stbi_set_flip_vertically_on_load(flip ? 1 : 0);
 }
