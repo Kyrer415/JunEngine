@@ -15,7 +15,7 @@ Texture::Texture(const ImageData& data)
 	glBindTexture(GL_TEXTURE_2D, m_ID);
 
 	// Настройка параметров фильтрации (как сглаживать картинку при растяжении)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	// Настройка повторения ( что делать, если координаты вышли за пределы от 0 до 1)
@@ -24,6 +24,8 @@ Texture::Texture(const ImageData& data)
 
 	// ВАЖНО: Копируем пиксели из оперативки (LocalBuffer) в видеопамять (GPU)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, m_Width, m_Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data.Pixels.get());
+
+	glGenerateMipmap(GL_TEXTURE_2D);   // видеокарта сама построит все уровни
 
 	// отвзяываем текстуру
 	glBindTexture(GL_TEXTURE_2D, 0);
