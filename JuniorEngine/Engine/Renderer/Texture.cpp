@@ -14,7 +14,7 @@ Texture::Texture(const ImageData& data)
 	glGenTextures(1, &m_ID);
 	glBindTexture(GL_TEXTURE_2D, m_ID);
 
-	// Настройка параметров фильтрации (как сглаживать картинку при растяжении)
+	// Настройка параметров фильтрации (как сглаживать картинку при уменьшении) мипмапы как лоды только для текстур
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
