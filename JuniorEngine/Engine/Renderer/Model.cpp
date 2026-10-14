@@ -1,21 +1,47 @@
 ﻿#include "Model.h"
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include <stdexcept>
+#include <filesystem>
 #include <iostream>
 
-Model::Model(const std::string& path)
+Model::Model(std::vector<MeshData>&& modelData)
 {
-	LoadModel(path);
+	// Резервируем память в векторе мешей, чтобы избежать лишних перевыделений
+	m_Meshes.reserve(modelData.size());
+
+	// Пробегаемся по всем кускм CPU-данных, которые нам прислали
+	for (auto& meshData : modelData)
+	{
+		// Собираем список реальных GPU-текстур из сырых картинок ImageData
+		std::vector<Texture> gpuTextures;
+		gpuTextures.reserve(meshData.TexturesData.size());
+
+		for (auto& imageData : meshData.TexturesData)
+		{
+			// Создаём объект текстуры во VRAM, передавая туда пиксели.
+			gpuTextures.emplace_back(imageData);
+			imageData.Pixels.reset();
+		}
+
+
+		// Собираем готовый Mesh в видеопамяти и пушим его в вектор модели
+		// передаём вергины, индексы и сгенерированные текстуры!
+		m_Meshes.emplace_back(meshData.Vertices, meshData.Indices, std::move(gpuTextures));
+	}
 }
 
-void Model::Draw(const Shader& shader) 
+void Model::Draw()
 {
 	// Проходимся по все мешам нашей модели и заставляем каждый отрисоваться
-	for ( auto& mesh : m_Meshes)
+	for (auto& mesh : m_Meshes)
 	{
 		mesh.Draw(); // у класса Mesh должен быть метод Draw
 	}
 }
 
-void Model::LoadModel(const std::string& path)
+std::vector<MeshData> Model::LoadModelFromDisk(const std::string& path)
 {
 	Assimp::Importer importer;
 
@@ -28,39 +54,39 @@ void Model::LoadModel(const std::string& path)
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{
 		std::cerr << "ОШИБКА::ASSIMP:: " << importer.GetErrorString() << std::endl;
-		return;
+		throw std::runtime_error(importer.GetErrorString());
 	}
 
-	// Извлекаем путь к папке, в которой лежит файл модели
-	m_Directory = path.substr(0, path.find_last_of('/'));
+	std::string directory = std::filesystem::path(path).parent_path().string();
+	std::vector<MeshData> modelData;
+
+	// вспомогательная лямбда-функция для рекурсивного оюхода нод (чтобы не плодить мтеоды в хедере)
+	auto processNode = [&](aiNode* node, const aiScene* scene, auto& self) -> void
+		{
+			for (unsigned int i = 0; i < node->mNumMeshes; i++)
+			{
+				aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+
+				// Вызываем парсинг меша
+				modelData.push_back(ProcessMesh(mesh, scene, directory));
+			}
+			for (unsigned int i = 0; i < node->mNumChildren; i++)
+			{
+				self(node->mChildren[i], scene, self);
+			}
+		};
 
 	// Запускаем рекурсивную обработку, начиная с самого главного (корневого) узла сцены
-	ProcessNode(scene->mRootNode, scene);
+	processNode(scene->mRootNode, scene, processNode);
 
 	std::cout << "УСПЕХ::Модель успешно загружена из:" << path << std::endl;
+	return modelData;
 }
 
-void Model::ProcessNode(aiNode* node, const aiScene* scene)
+MeshData Model::ProcessMesh(aiMesh* mesh, const aiScene* scene, const std::string& directory)
 {
-	// 1. Обрабатываем все меши, которые висят на текущем узлле (ноде)
-	for (unsigned int i = 0; i < node->mNumMeshes; i++)
-	{
-		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		m_Meshes.push_back(ProcessMesh(mesh, scene));
-	}
+	MeshData meshData;
 
-	// 2. РЕКУРСИЯ: Спускаемся глубже во всех детей текущего узла
-	for (unsigned int i = 0; i < node->mNumChildren; i++)
-	{
-		ProcessNode(node->mChildren[i], scene);
-	}
-}
-
-Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
-{
-	std::vector<Vertex> vertices;
-	std::vector<unsigned int> indices;
-	
 	// 1. Перекачиваем ВЕРШИНЫ
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 	{
@@ -90,7 +116,7 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 			vertex.TexCoords = glm::vec2(0.0f, 0.0f);
 		}
 
-		vertices.push_back(vertex);		
+		meshData.Vertices.push_back(vertex);
 	}
 
 	// 2. Перекачиваем ИНДЕКСЫ (сборка треугольников)
@@ -99,20 +125,11 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 		aiFace face = mesh->mFaces[i];
 		for (unsigned int j = 0; j < face.mNumIndices; j++)
 		{
-			indices.push_back(face.mIndices[j]);
+			meshData.Indices.push_back(face.mIndices[j]);
 		}
 	}
 
-	aiColor4D diffuseColor(1.0f, 1.0f, 1.0f, 1.0f); // По умолчанию белый
-
-	std::vector<Texture> textures;
-		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-
-		// Забираем diffuse цвет из файла .mtl
-		if (material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor) == AI_SUCCESS)
-		{
-
-		}
+	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
 	// Проверяем, есть ли у материала диффузные текстуры (карта цвета)
 	if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0)
@@ -121,14 +138,15 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 		material->GetTexture(aiTextureType_DIFFUSE, 0, &str);
 
 		// Склеиваем путь к папке модели и имя файла текстуры 
-		std::string texturePath = m_Directory + "/" + str.C_Str();
+		std::string texturePath = directory + "/" + str.C_Str();
 
 		// пушим путь в локальный вектор меша!
-		textures.emplace_back(Texture::LoadImageFromDisk(texturePath));
+		ImageData imgData = Texture::LoadImageFromDisk(texturePath);
+		meshData.TexturesData.push_back(std::move(imgData));
 
 	}
 
-	// Возвращаем готовый скомпилированный меш 
-	return Mesh(vertices, indices, std::move(textures));
+	// Возвращаем готовую кпу-структуру меша
+	return meshData;
 }
 

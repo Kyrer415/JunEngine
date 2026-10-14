@@ -2,12 +2,12 @@
 #include "Core/Transform.h"
 
 Application::Application()
-	: m_Window(1600, 1200, "JuniorEngine via OOP"),
-	m_Renderer(),
-	m_Camera(glm::vec3(0.0f, 0.0f, 3.0f)), // начальня позиция камеры
-	m_OurShader("basic.vert", "basic.frag"),
-	m_LightShader("basic.vert", "light.frag"),
-	m_TableModel("models/Table.obj"),
+    : m_Window(1600, 1200, "JuniorEngine via OOP"),
+    m_Renderer(),
+    m_Camera(glm::vec3(0.0f, 0.0f, 3.0f)), // начальня позиция камеры
+    m_OurShader("basic.vert", "basic.frag"),
+    m_LightShader("basic.vert", "light.frag"),
+    m_TableModel(Model::LoadModelFromDisk( "models/Table.obj")),
 	m_ImGui(m_Window.GetNativeWindow()), // Передаем нативное окно в конструктор ImGuiManager!
 	m_Settings(SceneSettings()),
     m_CubeMesh(Mesh::CreateCube()),
@@ -27,6 +27,11 @@ Application::~Application()
 void Application::Run()
 {
     m_Window.DisableCursor();
+
+    m_OurShader.Use();
+    m_OurShader.SetInt("texture1", 0); // Меш привяжет диффузную карту в слот 0
+    m_OurShader.SetInt("texture2", 1);
+
     while (!m_Window.ShouldClose())
     {
         // В самом начале кадра: обновляем Delta Time!
@@ -151,8 +156,8 @@ void Application::Run()
         // Настраиваем дефолтный материал для стола (сделаем его матовым)
         m_OurShader.SetMaterial("material", m_TableMaterial);
 
-        // Вызваем Draw классса Model, передавая туда шейдер!
-        m_TableModel.Draw(m_OurShader);
+        // Вызваем Draw классса Model, уже не передавая туда шейдер!
+        m_TableModel.Draw();
 
         // Отрисвка кубика для лампы -->
         m_LightShader.Use();

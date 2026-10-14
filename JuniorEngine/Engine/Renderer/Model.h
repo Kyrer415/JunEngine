@@ -3,38 +3,40 @@
 #include <string>
 #include <vector>
 #include "Renderer/Mesh.h" // тут лежат структура вершин vertex и класс mesh
+#include "Renderer/Texture.h"
 #include "Core/Transform.h"
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 
 class Shader;
+struct aiScene;
+struct aiMesh;
+
+struct MeshData
+{
+	std::vector<Vertex> Vertices;
+	std::vector<unsigned int> Indices;
+	std::vector<ImageData> TexturesData; // Сырые Cpu_данные картинок для меша стола
+};
 
 class Model
 {
 public:
-	// конструктор: принимает путь к 3д модели
-	Model(const std::string& path);
+	// конструктор: принимает нашу структуру меша
+	Model(std::vector<MeshData>&& modelData);
 
 	// Метож отрисовки всей модели (она может состоять из нескольких мешей)
-	void Draw(const Shader& shader) ;
+	void Draw() ;
 
 	Transform& GetTransform() { return m_Transform; }
 
+	static std::vector<MeshData> LoadModelFromDisk(const std::string& path);
+
 private:
-	// Функция загрузки модели через Assimp
-	void LoadModel(const std::string& path);
-
-	// Рекурсивный обход всех узлов (нод) 3д-файла
-	void ProcessNode(aiNode* node, const aiScene* scene);
-
 	// превращение меша Assimp в наш собственный объект класса Mesh
-	Mesh ProcessMesh(aiMesh* mesh, const aiScene* scene);
+	static MeshData ProcessMesh(aiMesh* mesh, const aiScene* scene, const std::string& directory);
 
 private:
 	// Модель может состоять ищ мнжества отдельных кусков
 	std::vector<Mesh> m_Meshes;
-	std::string m_Directory; // Папка, где лежит модель ( нужна, чтобы искать текстуры рядом)
 	Transform m_Transform;
 };
 
