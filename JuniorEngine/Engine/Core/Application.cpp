@@ -45,7 +45,7 @@ void Application::Run()
             m_Window.Close();
         }
 
-        // Переключаем режим на кнопку LEFT ALT , проверяя что с пролшлого нажатия прошло больше 0.2 сек
+        // Переключаем режим на кнопку LEFT ALT , проверяя что с прошлого нажатия прошло больше 0.2 сек
         if (Input::IsKeyPressed(m_Window, GLFW_KEY_LEFT_ALT))
         {
             if (m_Settings.altKeyReleased)
