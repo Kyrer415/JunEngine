@@ -11,6 +11,35 @@ struct ImageData
 	int Width{ 0 };
 	int Height{ 0 };
 	int Channels{ 0 };
+
+	// 1. Конструктор по умолчанию ( чтобы создавать структуры пустыми)
+	ImageData() = default;
+
+	// 2. Конструктор перемещения забираем указатель через move
+	ImageData(ImageData&& other) noexcept
+		: Pixels(std::move(other.Pixels)),
+		Width(other.Width),
+		Height(other.Height),
+		Channels(other.Channels)
+	{
+	}
+
+	// 3. Оператор присваивания перемеением ( Move Assignment)
+	ImageData& operator=(ImageData&& other) noexcept
+	{
+		if (this != &other)
+		{
+			Pixels = std::move(other.Pixels);
+			Width = other.Width;
+			Height = other.Height;
+			Channels = other.Channels;
+		}
+		return *this;
+	}
+
+	// 4. ЖЁстко запрещаем копирование(как у texture)
+	ImageData(const ImageData&) = delete;
+	ImageData& operator=(const ImageData&) = delete;
 };
 
 class Texture

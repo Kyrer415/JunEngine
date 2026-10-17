@@ -1,13 +1,14 @@
 ﻿#include "Application.h"
 #include "Core/Transform.h"
 
+#include <iostream>
+
 Application::Application()
     : m_Window(1600, 1200, "JuniorEngine via OOP"),
     m_Renderer(),
     m_Camera(glm::vec3(0.0f, 0.0f, 3.0f)), // начальня позиция камеры
     m_OurShader("basic.vert", "basic.frag"),
     m_LightShader("basic.vert", "light.frag"),
-    m_TableModel(Model::LoadModelFromDisk( "models/Table.obj")),
 	m_ImGui(m_Window.GetNativeWindow()), // Передаем нативное окно в конструктор ImGuiManager!
 	m_Settings(SceneSettings()),
     m_CubeMesh(Mesh::CreateCube()),
@@ -16,7 +17,9 @@ Application::Application()
     m_TableMaterial{ 0.1f, 0.8f, 0.0f, 1.0f }
 
 {
-	// пока пусто
+    // Запускаем асинхронный поток загрузки стола на CPU!
+    // std::launch::async принудительно заставляет вызов выполняться в параллельном потоке процессора.
+    m_TableLoadingFuture = std::async(std::launch::async, Model::LoadModelFromDisk, "models/Table.obj");
 }
 
 Application::~Application()
@@ -34,6 +37,23 @@ void Application::Run()
 
     while (!m_Window.ShouldClose())
     {
+
+        // Проверяем, активен ли ещё фоновый поток загрузки
+        if (m_TableLoadingFuture.valid())
+        {
+            // Спрашиваем поток: данные уже готовы? wait_for(0) опрашивает поток мгновенно, не фризя игру!
+            if (m_TableLoadingFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
+            {
+                // Поток закончил работу! забираем распарсенный векторо MeshData через .get!
+                std::vector<MeshData> parsedData = m_TableLoadingFuture.get();
+
+                // Создаём реальный GPU обхект модели в главном потоке!
+                m_TableModel = std::make_unique<Model>(std::move(parsedData));
+
+                std::cout << "* [ENGINE] Фоновая загрузка звершена! Модель стола успешно передана на GPU. \n";
+            }
+        }
+
         // В самом начале кадра: обновляем Delta Time!
         Time::Update();
 
@@ -77,7 +97,17 @@ void Application::Run()
         }
 
         m_ImGui.BeginFrame();
-        m_ImGui.RenderUI(m_Settings, m_TableModel.GetTransform());
+        if (m_TableModel)
+        {
+            m_ImGui.RenderUI(m_Settings, m_TableModel->GetTransform());
+        }
+        else
+        {
+            // Если стол ещё летит в фоне — передаём временную дефолтную структуру Transform,
+            // чтобы ImGui не падал по нулевому указателю, пока картинка грузится!
+            static Transform dummyTransform;
+            m_ImGui.RenderUI(m_Settings, dummyTransform);
+        }
 
         m_Renderer.Clear(0.1f, 0.1f, 0.14f, 1.0f);
         m_OurShader.Use();
@@ -148,16 +178,19 @@ void Application::Run()
         // Отрисовка 3д модели
         m_OurShader.Use();
 
-        glm::mat4 tableModelMatrix = m_TableModel.GetTransform().GetModelMatrix();
+        if (m_TableModel)
+        {
+            glm::mat4 tableModelMatrix = m_TableModel->GetTransform().GetModelMatrix();
 
-        // Закидываем матрицу модели в шейдер
-        m_OurShader.SetMatrix4("u_Model", tableModelMatrix);
+            // Закидываем матрицу модели в шейдер
+            m_OurShader.SetMatrix4("u_Model", tableModelMatrix);
 
-        // Настраиваем дефолтный материал для стола (сделаем его матовым)
-        m_OurShader.SetMaterial("material", m_TableMaterial);
+            // Настраиваем дефолтный материал для стола (сделаем его матовым)
+            m_OurShader.SetMaterial("material", m_TableMaterial);
 
-        // Вызваем Draw классса Model, уже не передавая туда шейдер!
-        m_TableModel.Draw();
+            // Вызваем Draw классса Model, уже не передавая туда шейдер!
+            m_TableModel->Draw();
+        }
 
         // Отрисвка кубика для лампы -->
         m_LightShader.Use();

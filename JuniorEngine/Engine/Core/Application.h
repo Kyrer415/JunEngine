@@ -13,6 +13,9 @@
 #include "Core/Transform.h"
 #include "Core\Scene.h"
 
+#include <future>
+#include <memory>
+
 class Application
 {
 public:
@@ -29,7 +32,8 @@ private:
 	Camera m_Camera;
 	Shader m_OurShader;
 	Shader m_LightShader;
-	Model m_TableModel;
+	std::unique_ptr<Model> m_TableModel;
+	std::future<std::vector<MeshData>> m_TableLoadingFuture;
 	ImGuiManager m_ImGui;
 	SceneSettings m_Settings;
 	Mesh m_CubeMesh;
