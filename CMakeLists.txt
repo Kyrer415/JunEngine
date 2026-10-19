@@ -37,6 +37,8 @@ add_executable(JuniorEngine
     JuniorEngine/Engine/Renderer/Camera.cpp
     JuniorEngine/Engine/Renderer/Model.h
     JuniorEngine/Engine/Renderer/Model.cpp
+    JuniorEngine/Engine/Renderer/ShaderManager.h
+    JuniorEngine/Engine/Renderer/ShaderManager.cpp
     JuniorEngine/Engine/Core/Application.h
     JuniorEngine/Engine/Core/Application.cpp
     JuniorEngine/Engine/Core/ImGuiManager.h
