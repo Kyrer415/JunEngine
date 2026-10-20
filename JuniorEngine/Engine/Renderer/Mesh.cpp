@@ -16,7 +16,7 @@ Mesh::Mesh(const Vertex* vertices, unsigned int vCount, const unsigned int* indi
 Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, std::vector<Texture> textures)
 {
 	m_IndexCount = indices.size();
-	m_Textures = std::move(textures); // копируем текстуры внутрь меша СТООООП не копируем, а перемещаем!!!!
+	m_Textures = std::move(textures); // перемещаем текстуры внутрь меша!!!!
 
 	// Умножаем кол-во элементов на размер одного unsigned int (4 байта)
 	unsigned int indiciesSizeInBytes = indices.size() * sizeof(unsigned int);
