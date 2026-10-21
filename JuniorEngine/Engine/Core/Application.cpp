@@ -7,8 +7,7 @@ Application::Application()
     : m_Window(1600, 1200, "JuniorEngine via OOP"),
     m_Renderer(),
     m_Camera(glm::vec3(0.0f, 0.0f, 3.0f)), // начальня позиция камеры
-    m_OurShader("basic.vert", "basic.frag"),
-    m_LightShader("basic.vert", "light.frag"),
+
 	m_ImGui(m_Window.GetNativeWindow()), // Передаем нативное окно в конструктор ImGuiManager!
 	m_Settings(SceneSettings()),
     m_CubeMesh(Mesh::CreateCube()),
@@ -17,6 +16,10 @@ Application::Application()
     m_TableMaterial{ 0.1f, 0.8f, 0.0f, 1.0f }
 
 {
+    // Загружаем и компилируем шейдеры под уникальными именами-ключами
+    m_ShaderManager.LoadShader("BasicShader", "basic.vert", "basic.frag");
+    m_ShaderManager.LoadShader("LightShader", "basic.vert", "light.frag");
+
     // Запускаем асинхронный поток загрузки стола на CPU!
     // std::launch::async принудительно заставляет вызов выполняться в параллельном потоке процессора.
     m_TableLoadingFuture = std::async(std::launch::async, Model::LoadModelFromDisk, "models/Table.obj");
@@ -31,9 +34,9 @@ void Application::Run()
 {
     m_Window.DisableCursor();
 
-    m_OurShader.Use();
-    m_OurShader.SetInt("texture1", 0); // Меш привяжет диффузную карту в слот 0
-    m_OurShader.SetInt("texture2", 1);
+    m_ShaderManager.UseShader("BasicShader");
+    m_ShaderManager.GetShader("BasicShader").SetInt("texture1", 0); // Меш привяжет диффузную карту в слот 0
+    m_ShaderManager.GetShader("BasicShader").SetInt("texture2", 1);
 
     while (!m_Window.ShouldClose())
     {
@@ -110,7 +113,7 @@ void Application::Run()
         }
 
         m_Renderer.Clear(0.1f, 0.1f, 0.14f, 1.0f);
-        m_OurShader.Use();
+        m_ShaderManager.UseShader("BasicShader");
 
         // Считаем новые координаты лампы по круговой орбите
     // lightColorIntensity и прочие наши параметры передаём от ImGui! :3
@@ -118,7 +121,7 @@ void Application::Run()
         float lightZ = cos(Time::GetTime() * m_Settings.lightOrbitSpeed) * m_Settings.lightRadius;
         float lightY = sin(Time::GetTime() * 2.0f) * 0.5f + m_Settings.lightHeight;
 
-        m_OurShader.SetFloat3("u_LightPos", lightX, lightY, lightZ);
+        m_ShaderManager.GetShader("BasicShader").SetFloat3("u_LightPos", lightX, lightY, lightZ);
 
 
         if (m_Settings.isDiscoMode)
@@ -129,16 +132,16 @@ void Application::Run()
             float g = sin(Time::GetTime() * 2.0f) * 0.5f + 0.5f;
             float b = sin(Time::GetTime() * 1.0f) * 0.5f + 0.5f;
 
-            m_OurShader.SetFloat3("u_LightColor", r, g, b); // наш диско цвет
+            m_ShaderManager.GetShader("BasicShader").SetFloat3("u_LightColor", r, g, b); // наш диско цвет
 
         }
         else
         {
-            m_OurShader.SetFloat3("u_LightColor", m_Settings.lightColorIntensity[0], m_Settings.lightColorIntensity[1], m_Settings.lightColorIntensity[2]); // наш белый цвет :3
+            m_ShaderManager.GetShader("BasicShader").SetFloat3("u_LightColor", m_Settings.lightColorIntensity[0], m_Settings.lightColorIntensity[1], m_Settings.lightColorIntensity[2]); // наш белый цвет :3
         }
 
 
-        m_OurShader.SetFloat3("u_ViewPos", m_Camera.GetPosition().x, m_Camera.GetPosition().y, m_Camera.GetPosition().z);
+        m_ShaderManager.GetShader("BasicShader").SetFloat3("u_ViewPos", m_Camera.GetPosition().x, m_Camera.GetPosition().y, m_Camera.GetPosition().z);
 
         // 3. Матрица VIEW (Наша виртуальная камера)
         glm::mat4 view = m_Camera.GetViewMatrix();
@@ -148,8 +151,8 @@ void Application::Run()
         glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)m_Window.GetWidth() / (float)m_Window.GetHeight(), 0.1f, 100.0f);
 
         // Тут матрицы уже две потому что model запускать через цикл!
-        m_OurShader.SetMatrix4("u_View", view);
-        m_OurShader.SetMatrix4("u_Projection", projection);
+        m_ShaderManager.GetShader("BasicShader").SetMatrix4("u_View", view);
+        m_ShaderManager.GetShader("BasicShader").SetMatrix4("u_Projection", projection);
 
         m_WallTexture.Bind(0);
         m_FaceTexture.Bind(1);
@@ -165,39 +168,39 @@ void Application::Run()
             model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
             model = glm::scale(model, glm::vec3(1.0f, m_Settings.CubeScale, 1.0f));
 
-            m_OurShader.SetMatrix4("u_Model", model);
+            m_ShaderManager.GetShader("BasicShader").SetMatrix4("u_Model", model);
 
             Material mat = obj.material;
             if (mat.specular > 0.0f)
                 mat.shininess = m_Settings.Shininess;
-            m_OurShader.SetMaterial("material", mat);
+            m_ShaderManager.GetShader("BasicShader").SetMaterial("material", mat);
 
             m_CubeMesh.Draw();
         }
 
         // Отрисовка 3д модели
-        m_OurShader.Use();
+        m_ShaderManager.UseShader("BasicShader");
 
         if (m_TableModel)
         {
             glm::mat4 tableModelMatrix = m_TableModel->GetTransform().GetModelMatrix();
 
             // Закидываем матрицу модели в шейдер
-            m_OurShader.SetMatrix4("u_Model", tableModelMatrix);
+            m_ShaderManager.GetShader("BasicShader").SetMatrix4("u_Model", tableModelMatrix);
 
             // Настраиваем дефолтный материал для стола (сделаем его матовым)
-            m_OurShader.SetMaterial("material", m_TableMaterial);
+            m_ShaderManager.GetShader("BasicShader").SetMaterial("material", m_TableMaterial);
 
             // Вызваем Draw классса Model, уже не передавая туда шейдер!
             m_TableModel->Draw();
         }
 
         // Отрисвка кубика для лампы -->
-        m_LightShader.Use();
+        m_ShaderManager.UseShader("LightShader");
 
         // Передаём в шейдер лампы те же самые общие матрицы View и Projection
-        m_LightShader.SetMatrix4("u_View", view);
-        m_LightShader.SetMatrix4("u_Projection", projection);
+        m_ShaderManager.GetShader("LightShader").SetMatrix4("u_View", view);
+        m_ShaderManager.GetShader("LightShader").SetMatrix4("u_Projection", projection);
 
 
         // Строим матрицу Model для лампы строго в её летающих координатах!
@@ -209,7 +212,7 @@ void Application::Run()
         // Масштабируем кубик лампы, делая его маленьким ( в 5 раз меньше обычного)
         lightModel = glm::scale(lightModel, glm::vec3(0.1f));
 
-        m_LightShader.SetMatrix4("u_Model", lightModel);
+        m_ShaderManager.GetShader("LightShader").SetMatrix4("u_Model", lightModel);
 
         m_CubeMesh.Draw();
 

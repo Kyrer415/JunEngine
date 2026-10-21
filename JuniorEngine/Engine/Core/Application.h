@@ -2,6 +2,7 @@
 
 #include "Window\Window.h"
 #include "Renderer\Shader.h" 
+#include "Renderer\ShaderManager.h"
 #include "Renderer\Renderer.h"
 #include "Renderer\Mesh.h"
 #include "Renderer\Model.h"
@@ -10,7 +11,7 @@
 #include "Core\CoreTime.h"
 #include "Core\Input.h"
 #include "Core\ImGuiManager.h"
-#include "Core/Transform.h"
+#include "Core\Transform.h"
 #include "Core\Scene.h"
 
 #include <future>
@@ -30,8 +31,7 @@ private:
 	Window m_Window;
 	Renderer m_Renderer;
 	Camera m_Camera;
-	Shader m_OurShader;
-	Shader m_LightShader;
+	ShaderManager m_ShaderManager;
 	std::unique_ptr<Model> m_TableModel;
 	std::future<std::vector<MeshData>> m_TableLoadingFuture;
 	ImGuiManager m_ImGui;
