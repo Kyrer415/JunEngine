@@ -9,7 +9,7 @@ class ShaderManager
 {
 public:
 
-	// Конструктор принимает структуру данных(пиксели, размеры, каналы)
+	// Конструктор
 	ShaderManager();
 	~ShaderManager();
 
