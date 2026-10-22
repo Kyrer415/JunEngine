@@ -6,7 +6,7 @@
 Application::Application()
     : m_Window(1600, 1200, "JuniorEngine via OOP"),
     m_Renderer(),
-    m_Camera(glm::vec3(0.0f, 0.0f, 3.0f)), // начальня позиция камеры
+    m_Camera(glm::vec3(0.0f, 0.0f, 3.0f)), // начальная позиция камеры
 
 	m_ImGui(m_Window.GetNativeWindow()), // Передаем нативное окно в конструктор ImGuiManager!
 	m_Settings(SceneSettings()),
