@@ -6,11 +6,19 @@
 
 struct Material;
 
+struct ShaderSourceProgram
+{
+	std::string VertexSource;
+	std::string FragmentSource;
+};
+
+
 class Shader
 {
 public:
 	// Конструктор принимает пути к файлам шейдеров на диске
-	Shader(const std::string& vertexPath, const std::string& fragmentPath);
+	Shader(const std::string& filepath);
+
 
 	// Деструктор удалит шейдерную программу из памяти видеокарты
 	~Shader();
@@ -42,8 +50,6 @@ public:
 	unsigned int GetID() const { return m_ID; }
 
 private:
-	// Внутренний метод для чтения текстового файла с диска
-	std::string ReadFile(const std::string& filePath);
 
 	// Внутренний метод для компиляции и проверки на ошибки
 	void Compile(const std::string& vertexCode, const std::string& fragmentCode);
@@ -55,5 +61,5 @@ private:
 private:
 	unsigned int m_ID; // ID скомпилированной шейдерной программы
 	mutable std::unordered_map<std::string, int> m_UniformCache; // 3. "Имя -> Id ячейки"
-
+	ShaderSourceProgram ParseShader(const std::string& filepath);
 };

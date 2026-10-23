@@ -17,8 +17,8 @@ Application::Application()
 
 {
     // Загружаем и компилируем шейдеры под уникальными именами-ключами
-    m_ShaderManager.LoadShader("BasicShader", "basic.vert", "basic.frag");
-    m_ShaderManager.LoadShader("LightShader", "basic.vert", "light.frag");
+    m_ShaderManager.LoadShader("BasicShader", "basic.glsl");
+    m_ShaderManager.LoadShader("LightShader", "light.glsl");
 
     // Запускаем асинхронный поток загрузки стола на CPU!
     // std::launch::async принудительно заставляет вызов выполняться в параллельном потоке процессора.

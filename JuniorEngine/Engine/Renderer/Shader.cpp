@@ -6,12 +6,15 @@
 #include <sstream>
 #include <iostream>
 
-Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath)
+Shader::Shader(const std::string& filepath)
 	: m_ID(0)
 {
+
+	ShaderSourceProgram source = ParseShader(filepath);
+
 	// читаем исходный код шейдеров из файлов на диске
-	std::string vertexCode = ReadFile(vertexPath);
-	std::string fragmentCode = ReadFile(fragmentPath);
+	std::string vertexCode = source.VertexSource;
+	std::string fragmentCode = source.FragmentSource;
 
 	// Если файлы успешно прочитаны, компилируем их
 	if (!vertexCode.empty() && !fragmentCode.empty())
@@ -30,7 +33,8 @@ Shader::~Shader()
 }
 
 Shader::Shader(Shader&& o) noexcept
-	:m_ID(o.m_ID)
+	:m_ID(o.m_ID),
+	 m_UniformCache(std::move(o.m_UniformCache))
 {
 	o.m_ID = 0;
 }
@@ -42,6 +46,7 @@ Shader& Shader::operator=(Shader&& o) noexcept
 		if (m_ID) glDeleteProgram(m_ID);
 		m_ID = o.m_ID;
 		o.m_ID = 0;
+		m_UniformCache = std::move(o.m_UniformCache);
 	}
 	return *this;
 }
@@ -51,38 +56,6 @@ void Shader::Use() const
 	// Активируем шейдерную программу для отрисвки
 	glUseProgram(m_ID);
 }
-
-std::string Shader::ReadFile(const std::string& filePath)
-{
-	std::string code;
-	std::ifstream shaderFile;
-
-	// Гарантируем, что объекты ifstream могут генерировать исключения
-	shaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-
-	try
-	{
-		// открываем файл
-		shaderFile.open(filePath);
-		std::stringstream shaderStream;
-
-		// Читаем содержиммое файла в буфер потока
-		shaderStream << shaderFile.rdbuf();
-
-		// Закрываем файл
-		shaderFile.close();
-
-		// Конвертируем поток в строку
-		code = shaderStream.str();
-	}
-	catch (std::ifstream::failure& e)
-	{
-		std::cerr << "ОШИБКА: Шейдерный файл не был успешно прочитан по пути:" << filePath << std::endl;
-	}
-	
-	return code;
-}
-
 
 void Shader::Compile(const std::string& vertexCode, const std::string& fragmentCode)
 {
@@ -133,7 +106,7 @@ void Shader::Compile(const std::string& vertexCode, const std::string& fragmentC
 	// Удаляем шейдера, они нам больше не нужны, так как они уже связаны в программе m_ID
 	glDeleteShader(vertex);
 	glDeleteShader(fragment);
-	 
+
 }
 
 void Shader::SetFloat4(const std::string& name, float v0, float v1, float v2, float v3) const
@@ -181,17 +154,17 @@ int Shader::GetUniformLocation(const std::string& name) const
 	}
 
 
-// 2. Если в кеше нет, справшивает у видеокарты
-int Location = glGetUniformLocation(m_ID, name.c_str());
+	// 2. Если в кеше нет, справшивает у видеокарты
+	int Location = glGetUniformLocation(m_ID, name.c_str());
 
-if (Location == -1)
-{
-	std::cerr << "Uniform not found: " << name << "\n";
-}
+	if (Location == -1)
+	{
+		std::cerr << "Uniform not found: " << name << "\n";
+	}
 
-// 3. Запоминаем в кэш
-m_UniformCache[name] = Location;
-return Location;
+	// 3. Запоминаем в кэш
+	m_UniformCache[name] = Location;
+	return Location;
 }
 
 void Shader::SetMatrix4(const std::string& name, const glm::mat4& matrix) const
@@ -230,4 +203,42 @@ void Shader::SetMaterial(const std::string& name, const Material& m) const
 	SetFloat(name + ".diffuse", m.diffuse);
 	SetFloat(name + ".specular", m.specular);
 	SetFloat(name + ".shininess", m.shininess);
+}
+
+ShaderSourceProgram Shader::ParseShader(const std::string& filepath)
+{
+	std::ifstream stream(filepath);
+	
+	if (!stream.is_open())
+		std::cerr << "ОШИБКА: не удалось открыть шейдер по пути: " << filepath << "\n";
+
+	// Перечисления для отслеживание, в какойб уфер сейчас пишем
+	enum class ShaderType { NONE = -1, VERTEX = 0, FRAGMENT = 1 };
+
+	std::string line;
+	std::stringstream ss[2]; // ss[0] для вершинного, ss[1] для фрагментного
+	ShaderType type = ShaderType::NONE;
+
+	while (std::getline(stream, line))
+	{
+		// Если нашли тег начала вершинного шейдера
+		if (line.find("#shader vertex") != std::string::npos)
+		{
+			type = ShaderType::VERTEX;
+		}
+		// Если нашли тег начала фрагментного шейдера
+		else if (line.find("#shader fragment") != std::string::npos)
+		{
+			type = ShaderType::FRAGMENT;
+		}
+		else
+		{
+			// Если мы уже внутри какого-то режима - пишем строку в соответствуюбщий стрим
+			if (type != ShaderType::NONE)
+			{
+				ss[(int)type] << line << '\n';
+			}
+		}
+	}
+	return { ss[0].str(), ss[1].str() };
 }

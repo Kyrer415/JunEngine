@@ -25,9 +25,10 @@ ShaderManager::~ShaderManager()
 {
 }
 
-void ShaderManager::LoadShader(const std::string& name, const std::string& vertPath, const std::string& fragPath)
+void ShaderManager::LoadShader(const std::string& name, const std::string& filepath)
 {
-	m_Shaders.try_emplace(name, vertPath, fragPath);
+	Shader newShader(filepath);
+	m_Shaders.insert({ name, std::move(newShader) });
 }
 
 void ShaderManager::UseShader(const std::string& name)

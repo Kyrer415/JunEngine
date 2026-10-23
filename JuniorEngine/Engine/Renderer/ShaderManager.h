@@ -23,7 +23,7 @@ public:
 
 
 	// принимает имя шейдера путь к файлам компилирует шейдер и кладёт его в мапу
-	void LoadShader(const std::string& name, const std::string& vertPath, const std::string& fragPath);
+	void LoadShader(const std::string& name, const std::string& filepath);
 	
 	// Возвращает ссылку на готовый шейдер по имени
 	Shader& GetShader(const std::string& name) { return m_Shaders.at(name); };
