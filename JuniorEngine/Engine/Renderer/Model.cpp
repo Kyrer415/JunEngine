@@ -48,7 +48,7 @@ std::vector<MeshData> Model::LoadModelFromDisk(const std::string& path)
 	// Читаем файл и применяем флаги постобработки:
 	// aiProcess_Triangulate - принудительно превращает любые полигоны (квадраты и т.д) в треугольники
 	// aiProcess_FlipUvs - зеркалит текстурные координаты по вертикали так как в OpenGL Y инвертирован
-	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate);
 
 	// Проверяем на ошибки загрузки
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
