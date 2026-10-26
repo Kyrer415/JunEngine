@@ -210,7 +210,10 @@ ShaderSourceProgram Shader::ParseShader(const std::string& filepath)
 	std::ifstream stream(filepath);
 	
 	if (!stream.is_open())
-		std::cerr << "ОШИБКА: не удалось открыть шейдер по пути: " << filepath << "\n";
+	{
+		const std::string error_msg = "[Shader Error]: Не удалось открыть шейдер по пути: " + filepath;
+		throw std::runtime_error(error_msg);
+	}
 
 	// Перечисления для отслеживание, в какой буфер сейчас пишем
 	enum class ShaderType { NONE = -1, VERTEX = 0, FRAGMENT = 1 };

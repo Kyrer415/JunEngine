@@ -74,9 +74,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 
 # ОЧИЩЕННЫЙ ТАРГЕТ С ПРАВИЛЬНЫМИ ПУТЯМИ (ДВА JuniorEngine)
 add_custom_target(CopyAssets ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/basic.vert" "${CMAKE_BINARY_DIR}/basic.vert"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/basic.frag" "${CMAKE_BINARY_DIR}/basic.frag"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/light.frag" "${CMAKE_BINARY_DIR}/light.frag"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/basic.glsl" "${CMAKE_BINARY_DIR}/basic.glsl"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/light.glsl" "${CMAKE_BINARY_DIR}/light.glsl"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${CMAKE_CURRENT_SOURCE_DIR}/JuniorEngine/openGL_Logo.png" "${CMAKE_BINARY_DIR}/openGL_Logo.png"
