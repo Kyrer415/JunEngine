@@ -12,7 +12,7 @@ public:
 	void Update(float time);
 	const std::vector<GameObject>& GetObjects() const { return m_Objects; }
 
-	void AddObject(GameObject object);
+	void AddObject(const GameObject& object);
 
 	void SetCubeScaleY(float settings);
 
