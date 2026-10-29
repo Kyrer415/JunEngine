@@ -32,7 +32,7 @@ Model::Model(std::vector<MeshData>&& modelData)
 	}
 }
 
-void Model::Draw()
+const void Model::Draw() const
 {
 	// Проходимся по все мешам нашей модели и заставляем каждый отрисоваться
 	for (auto& mesh : m_Meshes)

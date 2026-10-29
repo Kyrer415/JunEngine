@@ -1,6 +1,8 @@
 ﻿#include "Core/Scene.h"
+#include <glm/glm.hpp>
 
-Scene::Scene()
+
+Scene::Scene(const Model& CubeModel)
 {
 	const glm::vec3 positions[] = {
 	{ 0.0f,  0.0f,   0.0f }, { 2.0f,  5.0f, -15.0f },
@@ -12,18 +14,34 @@ Scene::Scene()
 
 	for (size_t i = 0; i < std::size(positions); i++)
 	{
-		SceneObject obj;
+		GameObject obj;
 		obj.transform.Position = positions[i];
 
 		obj.material = { 0.1f, 1.0f, 1.0f, 1.0f };
 
-		m_Cubes.push_back(obj);
+		obj.model = &CubeModel;
+
+		m_Objects.push_back(obj);
 	}
 }
 
-
-void Scene::Update(float time)
+void Scene::AddObject(const GameObject object)
 {
-
+	m_Objects.push_back(object);
 }
 
+void Scene::Update(float dt)
+{
+	for (size_t i = 0; i < m_Objects.size(); i++)
+	{
+		m_Objects[i].transform.Rotation += glm::vec3(1.0f, 0.3f, 0.5f) * ((20.0f * i) * dt);
+	}
+}
+
+void Scene::SetCubeScaleY(float scale)
+{
+	for (auto &obj : m_Objects)
+	{
+		obj.transform.Scale.y = scale;
+	}
+}

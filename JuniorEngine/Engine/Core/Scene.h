@@ -3,21 +3,19 @@
 #include "Transform.h"
 #include "Material.h"
 #include <vector>
-
-struct SceneObject
-{
-	Transform transform;
-	Material material;
-};
+#include "GameObject.h"
 
 class Scene
 {
 public:
-	Scene();
+	Scene(const Model& cubeModel);
 	void Update(float time);
-	const std::vector<SceneObject>& GetCubes() const { return m_Cubes; }
+	const std::vector<GameObject>& GetObjects() const { return m_Objects; }
+
+	void AddObject(GameObject object);
+
+	void SetCubeScaleY(float settings);
 
 private:
-	std::vector<SceneObject> m_Cubes;
-	SceneObject m_Table;
+	std::vector<GameObject> m_Objects;
 };

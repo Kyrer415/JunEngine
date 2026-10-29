@@ -1,28 +1,31 @@
 ﻿#include "Application.h"
+#include "Renderer\Mesh.h"
 #include "Core/Transform.h"
 
 #include <iostream>
 
 Application::Application()
-    : m_Window(1600, 1200, "JuniorEngine via OOP"),
-    m_Renderer(),
-    m_Camera(glm::vec3(0.0f, 0.0f, 3.0f)), // начальная позиция камеры
+	: m_Window(1600, 1200, "JuniorEngine via OOP"),
+	m_Renderer(),
+	m_Camera(glm::vec3(0.0f, 0.0f, 3.0f)), // начальная позиция камеры
 
 	m_ImGui(m_Window.GetNativeWindow()), // Передаем нативное окно в конструктор ImGuiManager!
 	m_Settings(SceneSettings()),
-    m_CubeMesh(Mesh::CreateCube()),
-    m_WallTexture(Texture::LoadImageFromDisk("openGL_Logo.png")),
-    m_FaceTexture(Texture::LoadImageFromDisk("UnrealEngine_Logo.png")),
-    m_TableMaterial{ 0.1f, 0.8f, 0.0f, 1.0f }
+	m_CubeModel(Mesh::CreateCube()),
+	m_tableObject(),
+	m_Scene(m_CubeModel),
+	m_WallTexture(Texture::LoadImageFromDisk("openGL_Logo.png")),
+	m_FaceTexture(Texture::LoadImageFromDisk("UnrealEngine_Logo.png")),
+	m_TableMaterial{ 0.1f, 0.8f, 0.0f, 1.0f }
 
 {
-    // Загружаем и компилируем шейдеры под уникальными именами-ключами
-    m_ShaderManager.LoadShader("BasicShader", "basic.glsl");
-    m_ShaderManager.LoadShader("LightShader", "light.glsl");
+	// Загружаем и компилируем шейдеры под уникальными именами-ключами
+	m_ShaderManager.LoadShader("BasicShader", "basic.glsl");
+	m_ShaderManager.LoadShader("LightShader", "light.glsl");
 
-    // Запускаем асинхронный поток загрузки стола на CPU!
-    // std::launch::async принудительно заставляет вызов выполняться в параллельном потоке процессора.
-    m_TableLoadingFuture = std::async(std::launch::async, Model::LoadModelFromDisk, "models/Table.obj");
+	// Запускаем асинхронный поток загрузки стола на CPU!
+	// std::launch::async принудительно заставляет вызов выполняться в параллельном потоке процессора.
+	m_TableLoadingFuture = std::async(std::launch::async, Model::LoadModelFromDisk, "models/Table.obj");
 }
 
 Application::~Application()
@@ -32,193 +35,196 @@ Application::~Application()
 
 void Application::Run()
 {
-    m_Window.DisableCursor();
+	m_Window.DisableCursor();
 
-    m_ShaderManager.UseShader("BasicShader");
-    m_ShaderManager.GetShader("BasicShader").SetInt("texture1", 0); // Меш привяжет диффузную карту в слот 0
-    m_ShaderManager.GetShader("BasicShader").SetInt("texture2", 1);
+	m_ShaderManager.UseShader("BasicShader");
+	m_ShaderManager.GetShader("BasicShader").SetInt("texture1", 0); // Меш привяжет диффузную карту в слот 0
+	m_ShaderManager.GetShader("BasicShader").SetInt("texture2", 1);
 
-    while (!m_Window.ShouldClose())
-    {
+	while (!m_Window.ShouldClose())
+	{
 
-        // Проверяем, активен ли ещё фоновый поток загрузки
-        if (m_TableLoadingFuture.valid())
-        {
-            // Спрашиваем поток: данные уже готовы? wait_for(0) опрашивает поток мгновенно, не фризя игру!
-            if (m_TableLoadingFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
-            {
-                // Поток закончил работу! забираем распарсенный векторо MeshData через .get!
-                std::vector<MeshData> parsedData = m_TableLoadingFuture.get();
+		// Проверяем, активен ли ещё фоновый поток загрузки
+		if (m_TableLoadingFuture.valid())
+		{
+			// Спрашиваем поток: данные уже готовы? wait_for(0) опрашивает поток мгновенно, не фризя игру!
+			if (m_TableLoadingFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
+			{
+				// Поток закончил работу! забираем распарсенный векторо MeshData через .get!
+				std::vector<MeshData> parsedData = m_TableLoadingFuture.get();
 
-                // Создаём реальный GPU обхект модели в главном потоке!
-                m_TableModel = std::make_unique<Model>(std::move(parsedData));
+				// Создаём реальный GPU обхект модели в главном потоке!
+				m_TableModel = std::make_unique<Model>(std::move(parsedData));
 
-                std::cout << "* [ENGINE] Фоновая загрузка звершена! Модель стола успешно передана на GPU. \n";
-            }
-        }
+				m_tableObject.model = m_TableModel.get();
+				m_tableObject.GetTransform().Position = glm::vec3(0.0f, 0.0f, 0.0f);
+				m_tableObject.material = m_TableMaterial;
 
-        // В самом начале кадра: обновляем Delta Time!
-        Time::Update();
+				std::cout << "* [ENGINE] Фоновая загрузка звершена! Модель стола успешно передана на GPU. \n";
+			}
+		}
 
-        m_Renderer.EnableZ();
+		// В самом начале кадра: обновляем Delta Time!
+		Time::Update();
 
-        // Обработка ввода: если нажат ESCAPE (код 256), закрываем движок!
-        if (Input::IsKeyPressed(m_Window, GLFW_KEY_ESCAPE))
-        {
-            m_Window.Close();
-        }
+		m_Renderer.EnableZ();
 
-        // Переключаем режим на кнопку LEFT ALT , проверяя что с прошлого нажатия прошло больше 0.2 сек
-        if (Input::IsKeyPressed(m_Window, GLFW_KEY_LEFT_ALT))
-        {
-            if (m_Settings.altKeyReleased)
-            {
-                m_Settings.isUIFocused = !m_Settings.isUIFocused;
+		// Обработка ввода: если нажат ESCAPE (код 256), закрываем движок!
+		if (Input::IsKeyPressed(m_Window, GLFW_KEY_ESCAPE))
+		{
+			m_Window.Close();
+		}
 
-
-                if (m_Settings.isUIFocused)
-                    m_Window.EnableCursor(); // освобождаем мышь для ImGui
-                else
-                    m_Window.DisableCursor();
-
-                m_Camera.ResetFirstMouse(); // сбрасываем чтобы камера не прыгнула при возврате в режим полёта
-
-                m_Settings.altKeyReleased = false; // блокируем повторные нажаития
-            }
-        }
-        else
-        {
-            m_Settings.altKeyReleased = true;
-        }
-
-        // Обрабатываем движение камеры только если мышь не занята интерфейсом!
-        if (!m_Settings.isUIFocused)
-        {
-
-            m_Camera.Update(m_Window, Time::GetDeltaTime());
-
-        }
-
-        m_ImGui.BeginFrame();
-        if (m_TableModel)
-        {
-            m_ImGui.RenderUI(m_Settings, m_TableModel->GetTransform());
-        }
-        else
-        {
-            // Если стол ещё летит в фоне — передаём временную дефолтную структуру Transform,
-            // чтобы ImGui не падал по нулевому указателю, пока картинка грузится!
-            static Transform dummyTransform;
-            m_ImGui.RenderUI(m_Settings, dummyTransform);
-        }
-
-        m_Renderer.Clear(0.1f, 0.1f, 0.14f, 1.0f);
-        m_ShaderManager.UseShader("BasicShader");
-
-        // Считаем новые координаты лампы по круговой орбите
-    // lightColorIntensity и прочие наши параметры передаём от ImGui! :3
-        float lightX = sin(Time::GetTime() * m_Settings.lightOrbitSpeed) * m_Settings.lightRadius;
-        float lightZ = cos(Time::GetTime() * m_Settings.lightOrbitSpeed) * m_Settings.lightRadius;
-        float lightY = sin(Time::GetTime() * 2.0f) * 0.5f + m_Settings.lightHeight;
-
-        m_ShaderManager.GetShader("BasicShader").SetFloat3("u_LightPos", lightX, lightY, lightZ);
+		// Переключаем режим на кнопку LEFT ALT , проверяя что с прошлого нажатия прошло больше 0.2 сек
+		if (Input::IsKeyPressed(m_Window, GLFW_KEY_LEFT_ALT))
+		{
+			if (m_Settings.altKeyReleased)
+			{
+				m_Settings.isUIFocused = !m_Settings.isUIFocused;
 
 
-        if (m_Settings.isDiscoMode)
-        {
-            // Плавно меняем RGB от времени.
-            // Синус бывает от -1 до 1, поэтому делаем * 0.5 + 0.5, чтобы получить чистые цвета от 0 до 1!
-            float r = sin(Time::GetTime() * 1.5f) * 0.5f + 0.5f;
-            float g = sin(Time::GetTime() * 2.0f) * 0.5f + 0.5f;
-            float b = sin(Time::GetTime() * 1.0f) * 0.5f + 0.5f;
+				if (m_Settings.isUIFocused)
+					m_Window.EnableCursor(); // освобождаем мышь для ImGui
+				else
+					m_Window.DisableCursor();
 
-            m_ShaderManager.GetShader("BasicShader").SetFloat3("u_LightColor", r, g, b); // наш диско цвет
+				m_Camera.ResetFirstMouse(); // сбрасываем чтобы камера не прыгнула при возврате в режим полёта
 
-        }
-        else
-        {
-            m_ShaderManager.GetShader("BasicShader").SetFloat3("u_LightColor", m_Settings.lightColorIntensity[0], m_Settings.lightColorIntensity[1], m_Settings.lightColorIntensity[2]); // наш белый цвет :3
-        }
+				m_Settings.altKeyReleased = false; // блокируем повторные нажаития
+			}
+		}
+		else
+		{
+			m_Settings.altKeyReleased = true;
+		}
 
+		// Обрабатываем движение камеры только если мышь не занята интерфейсом!
+		if (!m_Settings.isUIFocused)
+		{
 
-        m_ShaderManager.GetShader("BasicShader").SetFloat3("u_ViewPos", m_Camera.GetPosition().x, m_Camera.GetPosition().y, m_Camera.GetPosition().z);
+			m_Camera.Update(m_Window, Time::GetDeltaTime());
 
-        // 3. Матрица VIEW (Наша виртуальная камера)
-        glm::mat4 view = m_Camera.GetViewMatrix();
+		}
 
-        // 4. МАТРИЦА PROJECTION ( Перспектива)
-        // Параметры: угол обзора 45 градусов, соотношение сторон экрана , ближняя плоскость, дальняя плоскость
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)m_Window.GetWidth() / (float)m_Window.GetHeight(), 0.1f, 100.0f);
+		m_ImGui.BeginFrame();
+		if (m_TableModel)
+		{
+			m_ImGui.RenderUI(m_Settings, m_tableObject.GetTransform());
+		}
+		else
+		{
+			// Если стол ещё летит в фоне — передаём временную дефолтную структуру Transform,
+			// чтобы ImGui не падал по нулевому указателю, пока картинка грузится!
+			static Transform dummyTransform;
+			m_ImGui.RenderUI(m_Settings, dummyTransform);
+		}
 
-        // Тут матрицы уже две потому что model запускать через цикл!
-        m_ShaderManager.GetShader("BasicShader").SetMatrix4("u_View", view);
-        m_ShaderManager.GetShader("BasicShader").SetMatrix4("u_Projection", projection);
+		m_Renderer.Clear(0.1f, 0.1f, 0.14f, 1.0f);
+		m_ShaderManager.UseShader("BasicShader");
 
-        m_WallTexture.Bind(0);
-        m_FaceTexture.Bind(1);
+		// Считаем новые координаты лампы по круговой орбите
+	// lightColorIntensity и прочие наши параметры передаём от ImGui! :3
+		float lightX = sin(Time::GetTime() * m_Settings.lightOrbitSpeed) * m_Settings.lightRadius;
+		float lightZ = cos(Time::GetTime() * m_Settings.lightOrbitSpeed) * m_Settings.lightRadius;
+		float lightY = sin(Time::GetTime() * 2.0f) * 0.5f + m_Settings.lightHeight;
 
-        for (size_t i = 0; i < m_Scene.GetCubes().size(); i++)
-        {
-            const SceneObject& obj = m_Scene.GetCubes()[i];
-
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, obj.transform.Position);
-
-            float angle = 20.0f * i + 1.0f * Time::GetTime();
-            model = glm::rotate(model, angle, glm::vec3(1.0f, 0.3f, 0.5f));
-            model = glm::scale(model, glm::vec3(1.0f, m_Settings.CubeScale, 1.0f));
-
-            m_ShaderManager.GetShader("BasicShader").SetMatrix4("u_Model", model);
-
-            Material mat = obj.material;
-            if (mat.specular > 0.0f)
-                mat.shininess = m_Settings.Shininess;
-            m_ShaderManager.GetShader("BasicShader").SetMaterial("material", mat);
-
-            m_CubeMesh.Draw();
-        }
-
-        // Отрисовка 3д модели
-        m_ShaderManager.UseShader("BasicShader");
-
-        if (m_TableModel)
-        {
-            glm::mat4 tableModelMatrix = m_TableModel->GetTransform().GetModelMatrix();
-
-            // Закидываем матрицу модели в шейдер
-            m_ShaderManager.GetShader("BasicShader").SetMatrix4("u_Model", tableModelMatrix);
-
-            // Настраиваем дефолтный материал для стола (сделаем его матовым)
-            m_ShaderManager.GetShader("BasicShader").SetMaterial("material", m_TableMaterial);
-
-            // Вызваем Draw классса Model, уже не передавая туда шейдер!
-            m_TableModel->Draw();
-        }
-
-        // Отрисвка кубика для лампы -->
-        m_ShaderManager.UseShader("LightShader");
-
-        // Передаём в шейдер лампы те же самые общие матрицы View и Projection
-        m_ShaderManager.GetShader("LightShader").SetMatrix4("u_View", view);
-        m_ShaderManager.GetShader("LightShader").SetMatrix4("u_Projection", projection);
+		m_ShaderManager.GetShader("BasicShader").SetFloat3("u_LightPos", lightX, lightY, lightZ);
 
 
-        // Строим матрицу Model для лампы строго в её летающих координатах!
-        glm::mat4 lightModel = glm::mat4(1.0f);
+		if (m_Settings.isDiscoMode)
+		{
+			// Плавно меняем RGB от времени.
+			// Синус бывает от -1 до 1, поэтому делаем * 0.5 + 0.5, чтобы получить чистые цвета от 0 до 1!
+			float r = sin(Time::GetTime() * 1.5f) * 0.5f + 0.5f;
+			float g = sin(Time::GetTime() * 2.0f) * 0.5f + 0.5f;
+			float b = sin(Time::GetTime() * 1.0f) * 0.5f + 0.5f;
+
+			m_ShaderManager.GetShader("BasicShader").SetFloat3("u_LightColor", r, g, b); // наш диско цвет
+
+		}
+		else
+		{
+			m_ShaderManager.GetShader("BasicShader").SetFloat3("u_LightColor", m_Settings.lightColorIntensity[0], m_Settings.lightColorIntensity[1], m_Settings.lightColorIntensity[2]); // наш белый цвет :3
+		}
 
 
-        lightModel = glm::translate(lightModel, glm::vec3(lightX, lightY, lightZ));
+		m_ShaderManager.GetShader("BasicShader").SetFloat3("u_ViewPos", m_Camera.GetPosition().x, m_Camera.GetPosition().y, m_Camera.GetPosition().z);
 
-        // Масштабируем кубик лампы, делая его маленьким ( в 5 раз меньше обычного)
-        lightModel = glm::scale(lightModel, glm::vec3(0.1f));
+		// 3. Матрица VIEW (Наша виртуальная камера)
+		glm::mat4 view = m_Camera.GetViewMatrix();
 
-        m_ShaderManager.GetShader("LightShader").SetMatrix4("u_Model", lightModel);
+		// 4. МАТРИЦА PROJECTION ( Перспектива)
+		// Параметры: угол обзора 45 градусов, соотношение сторон экрана , ближняя плоскость, дальняя плоскость
+		glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)m_Window.GetWidth() / (float)m_Window.GetHeight(), 0.1f, 100.0f);
 
-        m_CubeMesh.Draw();
+		// Тут матрицы уже две потому что model запускать через цикл!
+		m_ShaderManager.GetShader("BasicShader").SetMatrix4("u_View", view);
+		m_ShaderManager.GetShader("BasicShader").SetMatrix4("u_Projection", projection);
 
-        // Финальный рендер кадра ImGui на экран
-        m_ImGui.EndFrame();
+		m_WallTexture.Bind(0);
+		m_FaceTexture.Bind(1);
 
-        m_Window.Update();
-    }
+		for (const GameObject& obj : m_Scene.GetObjects())
+		{
+			glm::mat4 modelMatrix = obj.transform.GetModelMatrix();
+
+			m_ShaderManager.GetShader("BasicShader").SetMatrix4("u_Model", modelMatrix);
+
+			Material mat = obj.material;
+			if (mat.specular > 0.0f)
+				mat.shininess = m_Settings.Shininess;
+			m_ShaderManager.GetShader("BasicShader").SetMaterial("material", mat);
+
+			if (obj.model)
+			{
+				obj.model->Draw();
+			}
+		}
+
+		// Отрисовка 3д модели
+		m_ShaderManager.UseShader("BasicShader");
+
+		if (m_TableModel)
+		{
+			glm::mat4 tableModelMatrix = m_tableObject.GetTransform().GetModelMatrix();
+
+			// Закидываем матрицу модели в шейдер
+			m_ShaderManager.GetShader("BasicShader").SetMatrix4("u_Model", tableModelMatrix);
+
+			// Настраиваем дефолтный материал для стола (сделаем его матовым)
+			m_ShaderManager.GetShader("BasicShader").SetMaterial("material", m_TableMaterial);
+
+			// Вызваем Draw классса Model, уже не передавая туда шейдер!
+			m_TableModel->Draw();
+		}
+
+		// Отрисвка кубика для лампы -->
+		m_ShaderManager.UseShader("LightShader");
+
+		// Передаём в шейдер лампы те же самые общие матрицы View и Projection
+		m_ShaderManager.GetShader("LightShader").SetMatrix4("u_View", view);
+		m_ShaderManager.GetShader("LightShader").SetMatrix4("u_Projection", projection);
+
+
+		// Строим матрицу Model для лампы строго в её летающих координатах!
+		glm::mat4 lightModel = glm::mat4(1.0f);
+
+
+		lightModel = glm::translate(lightModel, glm::vec3(lightX, lightY, lightZ));
+
+		// Масштабируем кубик лампы, делая его маленьким ( в 5 раз меньше обычного)
+		lightModel = glm::scale(lightModel, glm::vec3(0.1f));
+
+		m_ShaderManager.GetShader("LightShader").SetMatrix4("u_Model", lightModel);
+
+		m_CubeModel.Draw();
+
+		m_Scene.SetCubeScaleY(m_Settings.CubeScale);
+		m_Scene.Update(Time::GetDeltaTime());
+
+		// Финальный рендер кадра ImGui на экран
+		m_ImGui.EndFrame();
+
+		m_Window.Update();
+	}
 }

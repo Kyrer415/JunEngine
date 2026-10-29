@@ -46,6 +46,7 @@ add_executable(JuniorEngine
     JuniorEngine/Engine/Core/Scene.h
     JuniorEngine/Engine/Core/Scene.cpp
     JuniorEngine/Engine/Core/Material.h
+    JuniorEngine/Engine/Core/GameObject.h
 )
 
 

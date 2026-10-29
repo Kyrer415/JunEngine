@@ -4,7 +4,6 @@
 #include "Renderer\Shader.h" 
 #include "Renderer\ShaderManager.h"
 #include "Renderer\Renderer.h"
-#include "Renderer\Mesh.h"
 #include "Renderer\Model.h"
 #include "Renderer\Texture.h"
 #include "Renderer\Camera.h" 
@@ -35,9 +34,10 @@ private:
 	std::future<std::vector<MeshData>> m_TableLoadingFuture;
 	ImGuiManager m_ImGui;
 	SceneSettings m_Settings;
-	Mesh m_CubeMesh;
+	Model m_CubeModel;
+	GameObject m_tableObject;
+	Scene m_Scene;
 	Texture m_WallTexture;
 	Texture m_FaceTexture;
-	Scene m_Scene;
 	Material m_TableMaterial;
 };

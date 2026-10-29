@@ -23,10 +23,10 @@ public:
 	// конструктор: принимает нашу структуру меша
 	Model(std::vector<MeshData>&& modelData);
 
-	// Метож отрисовки всей модели (она может состоять из нескольких мешей)
-	void Draw() ;
+	Model(Mesh&& sigleMesh) { m_Meshes.push_back(std::move(sigleMesh)); }
 
-	Transform& GetTransform() { return m_Transform; }
+	// Метод отрисовки всей модели (она может состоять из нескольких мешей)
+	const void Draw() const;
 
 	static std::vector<MeshData> LoadModelFromDisk(const std::string& path);
 
@@ -37,6 +37,5 @@ private:
 private:
 	// Модель может состоять ищ мнжества отдельных кусков
 	std::vector<Mesh> m_Meshes;
-	Transform m_Transform;
 };
 

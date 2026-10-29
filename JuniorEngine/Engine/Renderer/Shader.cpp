@@ -1,10 +1,11 @@
 ﻿#include "Renderer\Shader.h"
-#include "Core/Material.h"
-#include <glad/glad.h>
-#include <glm/gtc/type_ptr.hpp>
+#include "Core\Material.h"
+#include <glad\glad.h>
+#include <glm\gtc\type_ptr.hpp>
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <stdexcept>
 
 Shader::Shader(const std::string& filepath)
 	: m_ID(0)
