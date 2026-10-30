@@ -21,6 +21,8 @@ Scene::Scene(const Model& CubeModel)
 
 		obj.model = &CubeModel;
 
+		obj.bIsDynamic = true;
+
 		obj.transform.Rotation = glm::vec3(1.0f, 0.3f, 0.5f) * (20.0f * i);
 
 		m_Objects.push_back(obj);
@@ -36,7 +38,11 @@ void Scene::Update(float dt)
 {
 	for (size_t i = 0; i < m_Objects.size(); i++)
 	{
-		m_Objects[i].transform.Rotation += glm::vec3(1.0f, 0.3f, 0.5f) * (50.0f * dt);
+
+		if (m_Objects[i].bIsDynamic)
+		{
+			m_Objects[i].transform.Rotation += glm::vec3(1.0f, 0.3f, 0.5f) * (50.0f * dt);
+		}
 	}
 }
 
@@ -45,5 +51,7 @@ void Scene::SetCubeScaleY(float scale)
 	for (auto &obj : m_Objects)
 	{
 		obj.transform.Scale.y = scale;
+		obj.transform.Scale.x = scale;
+		obj.transform.Scale.z = scale;
 	}
 }

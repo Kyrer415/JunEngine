@@ -14,5 +14,7 @@ public:
 	Transform& GetTransform() { return transform; }
 
 	const Model* model = nullptr;
+
+	bool bIsDynamic = false;
 private:
 };
