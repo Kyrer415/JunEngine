@@ -60,6 +60,14 @@ void Application::Run()
 				m_tableObject.GetTransform().Position = glm::vec3(0.0f, 0.0f, 0.0f);
 				m_tableObject.material = m_TableMaterial;
 
+
+
+
+				if (m_TableModel)
+				{
+					m_Scene.AddObject(m_tableObject);
+				}
+
 				std::cout << "* [ENGINE] Фоновая загрузка звершена! Модель стола успешно передана на GPU. \n";
 			}
 		}
@@ -107,17 +115,8 @@ void Application::Run()
 		}
 
 		m_ImGui.BeginFrame();
-		if (m_TableModel)
-		{
-			m_ImGui.RenderUI(m_Settings, m_tableObject.GetTransform());
-		}
-		else
-		{
-			// Если стол ещё летит в фоне — передаём временную дефолтную структуру Transform,
-			// чтобы ImGui не падал по нулевому указателю, пока картинка грузится!
-			static Transform dummyTransform;
-			m_ImGui.RenderUI(m_Settings, dummyTransform);
-		}
+
+
 
 		m_Renderer.Clear(0.1f, 0.1f, 0.14f, 1.0f);
 		m_ShaderManager.UseShader("BasicShader");
@@ -186,17 +185,17 @@ void Application::Run()
 
 		if (m_TableModel)
 		{
-			glm::mat4 tableModelMatrix = m_tableObject.GetTransform().GetModelMatrix();
+			m_ImGui.RenderUI(m_Settings, m_tableObject.GetTransform());
 
-			// Закидываем матрицу модели в шейдер
-			m_ShaderManager.GetShader("BasicShader").SetMatrix4("u_Model", tableModelMatrix);
-
-			// Настраиваем дефолтный материал для стола (сделаем его матовым)
-			m_ShaderManager.GetShader("BasicShader").SetMaterial("material", m_TableMaterial);
-
-			// Вызваем Draw классса Model, уже не передавая туда шейдер!
-			m_TableModel->Draw();
 		}
+		else
+		{
+			// Если стол ещё летит в фоне — передаём временную дефолтную структуру Transform,
+			// чтобы ImGui не падал по нулевому указателю, пока картинка грузится!
+			static Transform dummyTransform;
+			m_ImGui.RenderUI(m_Settings, dummyTransform);
+		}
+
 
 		// Отрисвка кубика для лампы -->
 		m_ShaderManager.UseShader("LightShader");
