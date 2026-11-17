@@ -35,7 +35,7 @@ private:
 	ImGuiManager m_ImGui;
 	SceneSettings m_Settings;
 	Model m_CubeModel;
-	GameObject m_tableObject;
+	std::shared_ptr<GameObject> m_tableObject;
 	Scene m_Scene;
 	Texture m_WallTexture;
 	Texture m_FaceTexture;

@@ -29,10 +29,10 @@ Scene::Scene(const Model& CubeModel)
 	}
 }
 
-void Scene::AddObject(const GameObject& object)
-{
-	m_Objects.push_back(object);
+void Scene::AddObject(std::shared_ptr<GameObject> object) {
+	m_ModObjects.emplace_back(object); // Теперь копируется только умный указатель, объект один!
 }
+
 
 void Scene::Update(float dt)
 {

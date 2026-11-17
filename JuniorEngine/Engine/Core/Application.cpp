@@ -56,14 +56,13 @@ void Application::Run()
 				// Создаём реальный GPU обхект модели в главном потоке!
 				m_TableModel = std::make_unique<Model>(std::move(parsedData));
 
-				m_tableObject.model = m_TableModel.get();
-				m_tableObject.GetTransform().Position = glm::vec3(0.0f, 0.0f, 0.0f);
-				m_tableObject.material = m_TableMaterial;
+				m_tableObject = std::make_shared<GameObject>();
+				m_tableObject->model = m_TableModel.get();
 
+				m_tableObject->GetTransform().Position = glm::vec3(0.0f, 0.0f, 0.0f);
+				m_tableObject->material = m_TableMaterial;
 
-
-
-				if (m_TableModel)
+				if (m_tableObject)
 				{
 					m_Scene.AddObject(m_tableObject);
 				}
@@ -180,12 +179,28 @@ void Application::Run()
 			}
 		}
 
+		for (const std::shared_ptr<GameObject>& obj : m_Scene.GetModObjects())
+		{
+			glm::mat4 modelMatrix = obj->transform.GetModelMatrix();
+			m_ShaderManager.GetShader("BasicShader").SetMatrix4("u_Model", modelMatrix);
+
+			Material mat = obj->material;
+			if (mat.specular > 0.0f)
+				mat.shininess = m_Settings.Shininess;
+			m_ShaderManager.GetShader("BasicShader").SetMaterial("material", mat);
+
+			if (obj->model)
+			{
+				obj->model->Draw();
+			}
+		}
+
 		// Отрисовка 3д модели
 		m_ShaderManager.UseShader("BasicShader");
 
 		if (m_TableModel)
 		{
-			m_ImGui.RenderUI(m_Settings, m_tableObject.GetTransform());
+			m_ImGui.RenderUI(m_Settings, m_tableObject->GetTransform());
 
 		}
 		else
@@ -195,7 +210,6 @@ void Application::Run()
 			static Transform dummyTransform;
 			m_ImGui.RenderUI(m_Settings, dummyTransform);
 		}
-
 
 		// Отрисвка кубика для лампы -->
 		m_ShaderManager.UseShader("LightShader");
